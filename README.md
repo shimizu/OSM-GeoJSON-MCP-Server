@@ -350,10 +350,9 @@ OpenStreetMapデータをファイルにダウンロードします。大きな�
 
 取得したGeoJSONデータは以下の方法で可視化できます：
 
-1. **付属のHTMLビューアー**: `geojson-viewer.html`をブラウザで開き、データをペースト
-2. **[geojson.io](https://geojson.io)**: オンラインでGeoJSONを可視化・編集
-3. **QGIS**: プロフェッショナルなGISソフトウェア
-4. **Leaflet/Mapbox**: Webアプリケーションでの地図表示
+1. **[geojson.io](https://geojson.io)**: オンラインでGeoJSONを可視化・編集
+2. **QGIS**: プロフェッショナルなGISソフトウェア
+3. **Leaflet/Mapbox**: Webアプリケーションでの地図表示
 
 ## 主要な日本の地点の座標
 
