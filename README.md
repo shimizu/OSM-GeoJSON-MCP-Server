@@ -16,7 +16,7 @@ OpenStreetMapのデータをOverpass API経由で取得し、GeoJSON形式で返
 - **📊 API統計** (`get_api_stats`): 使用統計、キャッシュ状況、エラー率の監視
 - **🔧 接続テスト** (`test_connection`): Overpass APIサーバーへの接続診断
 - **🔄 データ変換** (`convert_to_geojson`): OSMデータからGeoJSONへの変換
-- **📁 ファイル出力**: 全ツールで直接ファイル保存機能 (.geojson/.json)
+- **📁 ファイル出力**: 全ツールでファイルエクスポート機能 (.geojson/.json)
 
 ## 🚀 高度な機能
 
