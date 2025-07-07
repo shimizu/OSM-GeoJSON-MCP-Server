@@ -39,7 +39,7 @@ export async function getAmenities(overpassClient, args) {
   let amenityFilter = amenity_type !== 'all' ? `["amenity"="${amenity_type}"]` : '["amenity"]';
   
   // アメニティはノード（点）またはウェイ（エリア）として定義される
-  const query = `[out:json][timeout:60];
+  const query = `[out:json][timeout:180][maxsize:1073741824];
 (
   node${amenityFilter}(${minLat},${minLon},${maxLat},${maxLon});
   way${amenityFilter}(${minLat},${minLon},${maxLat},${maxLon});

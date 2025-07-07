@@ -5,6 +5,8 @@ import https from 'https';
 import fs from 'fs/promises';
 import path from 'path';
 import { createWriteStream } from 'fs';
+import { QueryCache } from './cache.js';
+import { apiLogger } from './logger.js';
 
 export class OverpassClient {
   constructor() {
@@ -27,6 +29,13 @@ export class OverpassClient {
 
     // ラウンドロビンで使用するサーバーのインデックス
     this.currentServerIndex = 0;
+    
+    // キャッシュ機能を初期化
+    this.cache = new QueryCache({
+      maxSize: 100,
+      ttl: 15 * 60 * 1000,  // 15分のTTL
+      cleanupInterval: 5 * 60 * 1000  // 5分ごとのクリーンアップ
+    });
   }
 
   // HTTPSリクエストをPromiseでラップした実装
@@ -89,8 +98,20 @@ export class OverpassClient {
 
   // Overpass APIへのクエリ実行
   // 複数のサーバーを順番に試し、成功するまで繰り返す
-  async query(queryString) {
+  async query(queryString, bypassCache = false, toolName = 'unknown') {
+    // キャッシュから取得を試行
+    if (!bypassCache) {
+      const cachedResult = this.cache.get(queryString);
+      if (cachedResult) {
+        apiLogger.logCacheHit(toolName, queryString);
+        return cachedResult;
+      } else {
+        apiLogger.logCacheMiss(toolName, queryString);
+      }
+    }
+    
     let lastError = null;
+    let requestInfo = null;
     
     // 現在のサーバーから順番に試す（ラウンドロビン）
     for (let i = 0; i < this.servers.length; i++) {
@@ -98,6 +119,8 @@ export class OverpassClient {
       const server = this.servers[serverIndex];
       
       try {
+        requestInfo = apiLogger.logRequestStart(toolName, queryString, server.host);
+        
         console.error(`Querying ${server.host}...`);
         const response = await this.httpsRequest(
           server.url,
@@ -108,14 +131,37 @@ export class OverpassClient {
         // 成功したサーバーを記憶（次回はこのサーバーから開始）
         this.currentServerIndex = serverIndex;
         
+        // 結果をキャッシュ
+        if (!bypassCache) {
+          this.cache.set(queryString, response);
+        }
+        
+        // 成功ログ
+        const responseSize = JSON.stringify(response).length;
+        apiLogger.logRequestComplete(requestInfo, true, responseSize);
+        
         return response;
       } catch (error) {
         lastError = error;
+        apiLogger.logError(error, server.host, toolName);
+        
+        // 失敗ログ
+        if (requestInfo) {
+          apiLogger.logRequestComplete(requestInfo, false, 0);
+        }
+        
         console.error(`Failed with ${server.host}: ${error.message}`);
         
         // レート制限（429エラー）の場合は少し待つ
         if (error.message.includes('429')) {
-          await new Promise(resolve => setTimeout(resolve, 5000));
+          const backoffTime = Math.min(5000 * Math.pow(2, i), 30000);  // 指数バックオフ（最大30秒）
+          console.error(`Rate limited, waiting ${backoffTime}ms before retry`);
+          await new Promise(resolve => setTimeout(resolve, backoffTime));
+        }
+        // 5xx系エラーの場合は短時間待機
+        else if (error.message.includes('500') || error.message.includes('502') || error.message.includes('503')) {
+          console.error(`Server error, waiting 2s before retry`);
+          await new Promise(resolve => setTimeout(resolve, 2000));
         }
       }
     }
@@ -143,6 +189,31 @@ export class OverpassClient {
     }
     
     return results;
+  }
+
+  // キャッシュ統計情報を取得
+  getCacheStats() {
+    return this.cache.getStats();
+  }
+
+  // API使用統計情報を取得
+  getApiStats() {
+    return apiLogger.getStats();
+  }
+
+  // 詳細統計を出力
+  printStats() {
+    apiLogger.printDetailedStats();
+  }
+
+  // キャッシュをクリア
+  clearCache() {
+    this.cache.clear();
+  }
+
+  // クリーンアップ（メモリリークを防ぐため）
+  destroy() {
+    this.cache.destroy();
   }
 
   // ファイルへの直接ダウンロード機能
@@ -228,7 +299,14 @@ export class OverpassClient {
           
           // レート制限の場合は少し待つ
           if (error.message.includes('429')) {
-            await new Promise(resolve => setTimeout(resolve, 5000));
+            const backoffTime = Math.min(5000 * Math.pow(2, i), 30000);  // 指数バックオフ（最大30秒）
+            console.error(`Rate limited, waiting ${backoffTime}ms before retry`);
+            await new Promise(resolve => setTimeout(resolve, backoffTime));
+          }
+          // 5xx系エラーの場合は短時間待機
+          else if (error.message.includes('500') || error.message.includes('502') || error.message.includes('503')) {
+            console.error(`Server error, waiting 2s before retry`);
+            await new Promise(resolve => setTimeout(resolve, 2000));
           }
         }
       }

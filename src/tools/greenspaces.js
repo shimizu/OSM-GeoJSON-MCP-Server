@@ -47,7 +47,7 @@ export async function getGreenSpaces(overpassClient, args) {
   let query;
   
   if (green_space_type === 'all') {
-    query = `[out:json][timeout:60];
+    query = `[out:json][timeout:180][maxsize:1073741824];
 (
   way["leisure"~"^(park|garden|nature_reserve)$"](${minLat},${minLon},${maxLat},${maxLon});
   way["landuse"~"^(forest|farmland|grass|meadow)$"](${minLat},${minLon},${maxLat},${maxLon});
@@ -90,7 +90,7 @@ out skel qt;`;
     const wayQueries = filters.map(filter => `way${filter}(${minLat},${minLon},${maxLat},${maxLon});`).join('\n  ');
     const relationQueries = filters.map(filter => `relation${filter}(${minLat},${minLon},${maxLat},${maxLon});`).join('\n  ');
     
-    query = `[out:json][timeout:60];
+    query = `[out:json][timeout:180][maxsize:1073741824];
 (
   ${wayQueries}
   ${relationQueries}

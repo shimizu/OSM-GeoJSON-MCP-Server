@@ -58,7 +58,7 @@ export async function getRoads(overpassClient, args) {
     roadFilter = '["highway"]';
   }
   
-  const query = `[out:json][timeout:60];
+  const query = `[out:json][timeout:180][maxsize:1073741824];
 (
   way${roadFilter}(${minLat},${minLon},${maxLat},${maxLon});
 );
@@ -112,7 +112,7 @@ out skel qt;`;
     }
     
     // 従来の動作：JSONレスポンスを返す
-    const osmData = await overpassClient.query(query);
+    const osmData = await overpassClient.query(query, false, 'get_roads');
     const geojson = osmToGeoJSON(osmData);
     
     const response = createGeoJSONResponse(geojson, {

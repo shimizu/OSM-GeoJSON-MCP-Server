@@ -47,7 +47,7 @@ export async function getRailways(overpassClient, args) {
   let query;
   
   if (railway_type === 'all') {
-    query = `[out:json][timeout:60];
+    query = `[out:json][timeout:180][maxsize:1073741824];
 (
   way["railway"](${minLat},${minLon},${maxLat},${maxLon});
   node["railway"](${minLat},${minLon},${maxLat},${maxLon});
@@ -58,7 +58,7 @@ out body;
 out skel qt;`;
   } else if (railway_type === 'station') {
     // 駅は主にノードとして表現される
-    query = `[out:json][timeout:60];
+    query = `[out:json][timeout:180][maxsize:1073741824];
 (
   node["railway"="station"](${minLat},${minLon},${maxLat},${maxLon});
   node["public_transport"="station"](${minLat},${minLon},${maxLat},${maxLon});
@@ -70,7 +70,7 @@ out skel qt;`;
 out body;`;
   } else if (railway_type === 'platform') {
     // プラットフォーム
-    query = `[out:json][timeout:60];
+    query = `[out:json][timeout:180][maxsize:1073741824];
 (
   way["railway"="platform"](${minLat},${minLon},${maxLat},${maxLon});
   way["public_transport"="platform"](${minLat},${minLon},${maxLat},${maxLon});
@@ -83,7 +83,7 @@ out body;
 out skel qt;`;
   } else {
     // 特定の線路タイプ（rail, subway, tram, monorail）
-    query = `[out:json][timeout:60];
+    query = `[out:json][timeout:180][maxsize:1073741824];
 (
   way["railway"="${railway_type}"](${minLat},${minLon},${maxLat},${maxLon});
   relation["railway"="${railway_type}"](${minLat},${minLon},${maxLat},${maxLon});

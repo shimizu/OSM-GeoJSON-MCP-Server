@@ -49,7 +49,7 @@ export async function getWaterways(overpassClient, args) {
   let query;
   
   if (waterway_type === 'all') {
-    query = `[out:json][timeout:60];
+    query = `[out:json][timeout:180][maxsize:1073741824];
 (
   way["waterway"](${minLat},${minLon},${maxLat},${maxLon});
   way["natural"="water"](${minLat},${minLon},${maxLat},${maxLon});
@@ -61,7 +61,7 @@ out body;
 out skel qt;`;
   } else if (['lake', 'reservoir', 'pond'].includes(waterway_type)) {
     // 湖、貯水池、池は natural=water で検索
-    query = `[out:json][timeout:60];
+    query = `[out:json][timeout:180][maxsize:1073741824];
 (
   way["natural"="water"]["water"="${waterway_type}"](${minLat},${minLon},${maxLat},${maxLon});
   way["natural"="water"][!"water"](${minLat},${minLon},${maxLat},${maxLon});
@@ -72,7 +72,7 @@ out body;
 out skel qt;`;
   } else {
     // 河川、運河など
-    query = `[out:json][timeout:60];
+    query = `[out:json][timeout:180][maxsize:1073741824];
 (
   way["waterway"="${waterway_type}"](${minLat},${minLon},${maxLat},${maxLon});
   relation["waterway"="${waterway_type}"](${minLat},${minLon},${maxLat},${maxLon});

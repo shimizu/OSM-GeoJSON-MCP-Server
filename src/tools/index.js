@@ -10,6 +10,7 @@ import { greenspacesToolSchema, getGreenSpaces } from './greenspaces.js';
 import { railwaysToolSchema, getRailways } from './railways.js';
 import { downloadOSMDataSchema, downloadAreaBuildingsSchema, downloadAreaAllSchema, downloadOSMData, downloadAreaBuildings, downloadAreaAll } from './download.js';
 import { convertToGeoJSONSchema, convertToGeoJSON } from './convert.js';
+import { statsToolSchema, getApiStats } from './stats.js';
 
 // すべてのツールスキーマをエクスポート
 export const toolSchemas = [
@@ -23,7 +24,8 @@ export const toolSchemas = [
   downloadOSMDataSchema,
   downloadAreaBuildingsSchema,
   downloadAreaAllSchema,
-  convertToGeoJSONSchema
+  convertToGeoJSONSchema,
+  statsToolSchema
 ];
 
 // ツール実行関数のマッピング
@@ -38,7 +40,8 @@ export const toolHandlers = {
   'download_osm_data': downloadOSMData,
   'download_area_buildings': downloadAreaBuildings,
   'download_area_all': downloadAreaAll,
-  'convert_to_geojson': convertToGeoJSON
+  'convert_to_geojson': convertToGeoJSON,
+  'get_api_stats': getApiStats
 };
 
 // ツール実行のディスパッチャー

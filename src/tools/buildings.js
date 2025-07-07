@@ -47,8 +47,8 @@ export async function getBuildings(overpassClient, args) {
   // 建物タイプのフィルター設定
   let buildingFilter = building_type !== 'all' ? `["building"="${building_type}"]` : '["building"]';
   
-  // Overpass QLクエリの構築
-  const query = `[out:json][timeout:60];
+  // Overpass QLクエリの構築（メモリ制限と最適化を追加）
+  const query = `[out:json][timeout:180][maxsize:1073741824];
 (
   way${buildingFilter}(${minLat},${minLon},${maxLat},${maxLon});
 );
@@ -102,7 +102,7 @@ out skel qt;`;
     }
     
     // 従来の動作：JSONレスポンスを返す
-    const osmData = await overpassClient.query(query);
+    const osmData = await overpassClient.query(query, false, 'get_buildings');
     const geojson = osmToGeoJSON(osmData);
     
     const response = createGeoJSONResponse(geojson, {
