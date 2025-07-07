@@ -1,13 +1,18 @@
 # OSM GeoJSON MCP Server
 
-OpenStreetMap（OSM）のデータをGeoJSON形式で取得するMCP（Model Context Protocol）サーバーです。Overpass APIを使用して、指定された地理的範囲内の建物、道路、施設などの地理データを取得できます。
+OpenStreetMap（OSM）のデータをGeoJSON形式で取得するMCP（Model Context Protocol）サーバーです。Overpass APIを使用して、指定された地理的範囲内の様々な地理データを取得できます。
 
 ## 特徴
 
 - 🏢 **建物データの取得** - 住宅、商業施設、工業施設などの建物の輪郭をポリゴンとして取得
 - 🛣️ **道路ネットワークの取得** - 高速道路から住宅街の道路まで、様々なタイプの道路をラインストリングとして取得
 - 📍 **施設（アメニティ）の取得** - レストラン、病院、学校などのPOI（Point of Interest）データを取得
+- 🌊 **水域・河川データの取得** - 川、湖、海、運河などの水域情報を取得
+- 🌳 **緑地・公園データの取得** - 公園、森林、農地、庭園などの緑地情報を取得
+- 🚃 **鉄道データの取得** - 鉄道線路、駅、地下鉄、トラムなどの交通インフラを取得
+- 🗺️ **境界線データの取得** - 国境、都道府県境、市区町村境などの行政境界を取得
 - 🌏 **標準的なGeoJSON形式** - Leaflet、Mapbox、QGISなどの一般的なGISツールで直接利用可能
+- 🔧 **モジュラーアーキテクチャ** - 各機能が独立したモジュールで、拡張が容易
 
 ## 必要な環境
 
@@ -34,7 +39,13 @@ npm install
 ### 基本的な起動方法
 
 ```bash
-node osm-geojson-mcp.js
+npm start
+```
+
+または
+
+```bash
+node src/index.js
 ```
 
 ### MCP Inspectorでのテスト
@@ -42,7 +53,13 @@ node osm-geojson-mcp.js
 開発・デバッグには[MCP Inspector](https://github.com/modelcontextprotocol/inspector)の使用を推奨します：
 
 ```bash
-npx @modelcontextprotocol/inspector node osm-geojson-mcp.js
+npm run dev
+```
+
+または
+
+```bash
+npx @modelcontextprotocol/inspector node src/index.js
 ```
 
 ブラウザでアクセスしてツールをテストできます。
@@ -60,7 +77,7 @@ npx @modelcontextprotocol/inspector node osm-geojson-mcp.js
   "mcpServers": {
     "osm-geojson": {
       "command": "node",
-      "args": ["/path/to/your/osm-geojson-mcp.js"]
+      "args": ["/path/to/your/src/index.js"]
     }
   }
 }
@@ -151,6 +168,108 @@ Overpass APIサーバーへの接続をテストします。
 }
 ```
 
+### 5. get_waterways
+指定した矩形範囲内の水域・河川データを取得します。
+
+**パラメータ**:
+- `minLon`, `minLat`, `maxLon`, `maxLat`: 範囲指定
+- `waterway_type` (string, オプション): 水域タイプ
+  - `river`: 河川
+  - `stream`: 小川
+  - `canal`: 運河
+  - `lake`: 湖
+  - `reservoir`: 貯水池
+  - `pond`: 池
+  - `all`: すべて（デフォルト）
+
+**使用例**:
+```json
+{
+  "minLon": 139.765,
+  "minLat": 35.680,
+  "maxLon": 139.770,
+  "maxLat": 35.685,
+  "waterway_type": "river"
+}
+```
+
+### 6. get_green_spaces
+指定した矩形範囲内の緑地・公園データを取得します。
+
+**パラメータ**:
+- `minLon`, `minLat`, `maxLon`, `maxLat`: 範囲指定
+- `green_space_type` (string, オプション): 緑地タイプ
+  - `park`: 公園
+  - `forest`: 森林
+  - `garden`: 庭園
+  - `farmland`: 農地
+  - `grass`: 草地
+  - `meadow`: 牧草地
+  - `nature_reserve`: 自然保護区
+  - `all`: すべて（デフォルト）
+
+**使用例**:
+```json
+{
+  "minLon": 139.765,
+  "minLat": 35.680,
+  "maxLon": 139.770,
+  "maxLat": 35.685,
+  "green_space_type": "park"
+}
+```
+
+### 7. get_railways
+指定した矩形範囲内の鉄道データを取得します。
+
+**パラメータ**:
+- `minLon`, `minLat`, `maxLon`, `maxLat`: 範囲指定
+- `railway_type` (string, オプション): 鉄道タイプ
+  - `rail`: 鉄道
+  - `subway`: 地下鉄
+  - `tram`: トラム
+  - `monorail`: モノレール
+  - `station`: 駅
+  - `platform`: プラットフォーム
+  - `all`: すべて（デフォルト）
+
+**使用例**:
+```json
+{
+  "minLon": 139.765,
+  "minLat": 35.680,
+  "maxLon": 139.770,
+  "maxLat": 35.685,
+  "railway_type": "station"
+}
+```
+
+### 8. get_boundaries
+指定した矩形範囲内の境界線データを取得します。
+
+**パラメータ**:
+- `minLon`, `minLat`, `maxLon`, `maxLat`: 範囲指定
+- `admin_level` (string, オプション): 行政レベル
+  - `2`: 国境
+  - `4`: 都道府県境
+  - `6`: 郡境
+  - `7`: 市区境
+  - `8`: 市区町村境
+  - `9`: 町・字境
+  - `10`: その他の小区画
+  - `all`: すべて（デフォルト）
+
+**使用例**:
+```json
+{
+  "minLon": 139.765,
+  "minLat": 35.680,
+  "maxLon": 139.770,
+  "maxLat": 35.685,
+  "admin_level": "8"
+}
+```
+
 ## 出力形式
 
 すべてのツールは以下の形式でGeoJSONデータを返します：
@@ -233,6 +352,52 @@ Overpass APIサーバーへの接続をテストします。
 2. 座標の順序（西、南、東、北）を確認
 3. エリアを少し広げて再試行
 
+## 開発・拡張
+
+### アーキテクチャ
+
+このサーバーはモジュラーアーキテクチャを採用しており、機能の追加や拡張が容易です：
+
+```
+src/
+├── index.js                    # エントリーポイント
+├── server/
+│   ├── OSMGeoJSONServer.js    # メインサーバークラス
+│   └── config.js              # サーバー設定
+├── tools/
+│   ├── index.js               # ツール統合・エクスポート
+│   ├── buildings.js           # 建物取得ツール
+│   ├── roads.js               # 道路取得ツール
+│   ├── amenities.js           # アメニティ取得ツール
+│   ├── waterways.js           # 水域取得ツール
+│   ├── greenspaces.js         # 緑地取得ツール
+│   ├── railways.js            # 鉄道取得ツール
+│   └── boundaries.js          # 境界線取得ツール
+├── utils/
+│   ├── overpass.js            # Overpass API通信
+│   ├── converter.js           # OSM→GeoJSON変換
+│   └── validator.js           # 入力検証
+```
+
+### 新しいツールの追加
+
+1. `src/tools/`に新しいファイルを作成
+2. ツールスキーマと実装関数をエクスポート
+3. `src/tools/index.js`にインポートして登録
+
+### 開発用スクリプト
+
+```bash
+# 開発用サーバー起動（MCP Inspector付き）
+npm run dev
+
+# 基本的な接続テスト
+npm run test:simple
+
+# 詳細なネットワーク診断
+npm run test:diagnostic
+```
+
 ## 技術的な詳細
 
 このサーバーは以下の技術を使用しています：
@@ -241,6 +406,7 @@ Overpass APIサーバーへの接続をテストします。
 - **MCP (Model Context Protocol)**: AIアシスタントとの統合プロトコル
 - **Node.js**: サーバーランタイム
 - **HTTPS with IP直接接続**: DNS解決の問題を回避
+- **モジュラー設計**: 機能別の独立したモジュール
 
 ## ライセンス
 
