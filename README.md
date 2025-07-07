@@ -1,6 +1,6 @@
 # OSM GeoJSON MCP Server
 
-OpenStreetMapのデータをOverpass API経由で取得し、GeoJSON形式で返すMCP (Model Context Protocol)サーバーです。OSM/Overpass API規約に完全準拠した実装で、キャッシュ機能、ログ機能、統計機能を備えた包括的なGISデータ取得ソリューションです。
+OpenStreetMapのデータをOverpass API経由で取得し、GeoJSON形式で返すMCP (Model Context Protocol)サーバーです。
 
 ## 🌟 主要機能
 
