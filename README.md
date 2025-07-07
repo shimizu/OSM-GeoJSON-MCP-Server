@@ -34,7 +34,7 @@ npm install
 ### 基本的な起動方法
 
 ```bash
-node working-osm-geojson-mcp.js
+node osm-geojson-mcp.js
 ```
 
 ### MCP Inspectorでのテスト
@@ -42,7 +42,7 @@ node working-osm-geojson-mcp.js
 開発・デバッグには[MCP Inspector](https://github.com/modelcontextprotocol/inspector)の使用を推奨します：
 
 ```bash
-npx @modelcontextprotocol/inspector node working-osm-geojson-mcp.js
+npx @modelcontextprotocol/inspector node osm-geojson-mcp.js
 ```
 
 ブラウザで http://localhost:5173 にアクセスしてツールをテストできます。
@@ -60,7 +60,7 @@ npx @modelcontextprotocol/inspector node working-osm-geojson-mcp.js
   "mcpServers": {
     "osm-geojson": {
       "command": "node",
-      "args": ["/path/to/your/working-osm-geojson-mcp.js"]
+      "args": ["/path/to/your/osm-geojson-mcp.js"]
     }
   }
 }
