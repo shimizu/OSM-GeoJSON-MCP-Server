@@ -17,17 +17,18 @@ const server = spawn('node', [serverPath], {
 
 // Wait for server to start
 setTimeout(() => {
-  // Test download_area_buildings
+  // Test get_buildings with file output
   const testDownload = {
     jsonrpc: '2.0',
-    method: 'tools/call',
+    method: 'call_tool',
     params: {
-      name: 'download_area_buildings',
+      name: 'get_buildings',
       arguments: {
         minLon: 139.7,
         minLat: 35.65,
         maxLon: 139.71,
         maxLat: 35.66,
+        building_type: 'all',
         output_path: './test-data/test-buildings.json'
       }
     },
@@ -40,7 +41,7 @@ setTimeout(() => {
   setTimeout(() => {
     const testConvert = {
       jsonrpc: '2.0',
-      method: 'tools/call',
+      method: 'call_tool',
       params: {
         name: 'convert_to_geojson',
         arguments: {
@@ -57,7 +58,7 @@ setTimeout(() => {
   // Test listing tools
   const listTools = {
     jsonrpc: '2.0',
-    method: 'tools/list',
+    method: 'list_tools',
     params: {},
     id: 3
   };

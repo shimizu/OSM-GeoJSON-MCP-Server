@@ -28,7 +28,7 @@ setTimeout(async () => {
     // Test 1: Buildings with file output (.geojson)
     {
       jsonrpc: '2.0',
-      method: 'tools/call',
+      method: 'call_tool',
       params: {
         name: 'get_buildings',
         arguments: {
@@ -45,7 +45,7 @@ setTimeout(async () => {
     // Test 2: Roads with file output (.json)
     {
       jsonrpc: '2.0',
-      method: 'tools/call',
+      method: 'call_tool',
       params: {
         name: 'get_roads',
         arguments: {
@@ -62,7 +62,7 @@ setTimeout(async () => {
     // Test 3: Amenities without file output (traditional response)
     {
       jsonrpc: '2.0',
-      method: 'tools/call',
+      method: 'call_tool',
       params: {
         name: 'get_amenities',
         arguments: {
@@ -78,7 +78,7 @@ setTimeout(async () => {
     // Test 4: Railways with file output
     {
       jsonrpc: '2.0',
-      method: 'tools/call',
+      method: 'call_tool',
       params: {
         name: 'get_railways',
         arguments: {
@@ -86,7 +86,7 @@ setTimeout(async () => {
           minLat: 35.670,
           maxLon: 139.780,
           maxLat: 35.690,
-          railway_type: 'station',
+          railway_type: 'all',
           output_path: './test-downloads/stations.geojson'
         }
       },

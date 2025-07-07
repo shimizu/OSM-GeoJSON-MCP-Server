@@ -134,3 +134,8 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+test_output/
+test-data/
+test-downloads/
+test-features/

@@ -7,8 +7,15 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "npx @modelcontextprotocol/inspector node src/index.js",
+    "test": "node test/index.js",
+    "test:all": "node test/index.js",
+    "test:critical": "node test/index.js --critical-only",
+    "test:fast": "node test/index.js --critical-only --fail-fast",
     "test:simple": "node test/simple-test.js",
-    "test:diagnostic": "node test/network-diagnostic.js"
+    "test:diagnostic": "node test/network-diagnostic.js",
+    "test:features": "node test/test-new-features.js",
+    "test:download": "node test/test-download.js",
+    "test:direct": "node test/test-direct-download.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.6.0",
