@@ -1,6 +1,6 @@
 # OSM GeoJSON MCP Server
 
-OpenStreetMap（OSM）のデータをGeoJSON形式で取得するMCP（Model Context Protocol）サーバーです。Overpass APIを使用して、指定された地理的範囲内の様々な地理データを取得できます。
+OpenStreetMap（OSM）のデータをGeoJSON形式で取得するMCP（Model Context Protocol）サーバーです。Overpass APIを使用して、指定された地理的範囲内の7種類の地理データを取得できます。
 
 ## 特徴
 
@@ -10,9 +10,9 @@ OpenStreetMap（OSM）のデータをGeoJSON形式で取得するMCP（Model Con
 - 🌊 **水域・河川データの取得** - 川、湖、海、運河などの水域情報を取得
 - 🌳 **緑地・公園データの取得** - 公園、森林、農地、庭園などの緑地情報を取得
 - 🚃 **鉄道データの取得** - 鉄道線路、駅、地下鉄、トラムなどの交通インフラを取得
-- 🗺️ **境界線データの取得** - 国境、都道府県境、市区町村境などの行政境界を取得
 - 🌏 **標準的なGeoJSON形式** - Leaflet、Mapbox、QGISなどの一般的なGISツールで直接利用可能
 - 🔧 **モジュラーアーキテクチャ** - 各機能が独立したモジュールで、拡張が容易
+- 🧪 **接続テスト機能** - Overpass APIへの接続状態を確認可能
 
 ## 必要な環境
 
@@ -85,7 +85,7 @@ npx @modelcontextprotocol/inspector node src/index.js
 
 3. Claude Desktopを再起動
 
-## 利用可能なツール
+## 利用可能なツール（7種類）
 
 ### 1. test_connection
 Overpass APIサーバーへの接続をテストします。
@@ -219,7 +219,7 @@ Overpass APIサーバーへの接続をテストします。
 }
 ```
 
-### 7. get_railways
+### 7. get_railways（最終ツール）
 指定した矩形範囲内の鉄道データを取得します。
 
 **パラメータ**:
@@ -244,31 +244,6 @@ Overpass APIサーバーへの接続をテストします。
 }
 ```
 
-### 8. get_boundaries
-指定した矩形範囲内の境界線データを取得します。
-
-**パラメータ**:
-- `minLon`, `minLat`, `maxLon`, `maxLat`: 範囲指定
-- `admin_level` (string, オプション): 行政レベル
-  - `2`: 国境
-  - `4`: 都道府県境
-  - `6`: 郡境
-  - `7`: 市区境
-  - `8`: 市区町村境
-  - `9`: 町・字境
-  - `10`: その他の小区画
-  - `all`: すべて（デフォルト）
-
-**使用例**:
-```json
-{
-  "minLon": 139.765,
-  "minLat": 35.680,
-  "maxLon": 139.770,
-  "maxLat": 35.685,
-  "admin_level": "8"
-}
-```
 
 ## 出力形式
 
@@ -372,7 +347,6 @@ src/
 │   ├── waterways.js           # 水域取得ツール
 │   ├── greenspaces.js         # 緑地取得ツール
 │   ├── railways.js            # 鉄道取得ツール
-│   └── boundaries.js          # 境界線取得ツール
 ├── utils/
 │   ├── overpass.js            # Overpass API通信
 │   ├── converter.js           # OSM→GeoJSON変換

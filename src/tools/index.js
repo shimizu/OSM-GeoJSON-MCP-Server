@@ -8,7 +8,6 @@ import { testConnectionToolSchema, testConnection } from './test_connection.js';
 import { waterwaysToolSchema, getWaterways } from './waterways.js';
 import { greenspacesToolSchema, getGreenSpaces } from './greenspaces.js';
 import { railwaysToolSchema, getRailways } from './railways.js';
-import { boundariesToolSchema, getBoundaries } from './boundaries.js';
 
 // すべてのツールスキーマをエクスポート
 export const toolSchemas = [
@@ -18,8 +17,7 @@ export const toolSchemas = [
   testConnectionToolSchema,
   waterwaysToolSchema,
   greenspacesToolSchema,
-  railwaysToolSchema,
-  boundariesToolSchema
+  railwaysToolSchema
 ];
 
 // ツール実行関数のマッピング
@@ -30,8 +28,7 @@ export const toolHandlers = {
   'test_connection': testConnection,
   'get_waterways': getWaterways,
   'get_green_spaces': getGreenSpaces,
-  'get_railways': getRailways,
-  'get_boundaries': getBoundaries
+  'get_railways': getRailways
 };
 
 // ツール実行のディスパッチャー
