@@ -1,0 +1,25 @@
+{
+  "name": "osm-geojson-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for fetching OpenStreetMap data as GeoJSON",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.6.0",
+    "@turf/turf": "^7.0.0",
+    "axios": "^1.7.2",
+    "require": "^2.4.20"
+  },
+  "keywords": [
+    "mcp",
+    "openstreetmap",
+    "geojson",
+    "gis",
+    "geography"
+  ],
+  "author": "",
+  "license": "MIT"
+}
