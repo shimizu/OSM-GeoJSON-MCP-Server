@@ -3,6 +3,7 @@
 
 import { validateCommonInputs, validateFilter } from '../utils/validator.js';
 import { osmToGeoJSON, createGeoJSONResponse } from '../utils/converter.js';
+import { handleQueryWithOptionalFile } from '../utils/file-handler.js';
 
 export const greenspacesToolSchema = {
   name: 'get_green_spaces',
@@ -19,6 +20,10 @@ export const greenspacesToolSchema = {
         description: '緑地タイプフィルター（オプション）',
         enum: ['park', 'forest', 'garden', 'farmland', 'grass', 'meadow', 'nature_reserve', 'all'],
         default: 'all'
+      },
+      output_path: {
+        type: 'string',
+        description: '保存先ファイルパス（オプション）。指定するとファイルに保存、指定しないとJSON応答を返す'
       }
     },
     required: ['minLon', 'minLat', 'maxLon', 'maxLat']
@@ -26,7 +31,7 @@ export const greenspacesToolSchema = {
 };
 
 export async function getGreenSpaces(overpassClient, args) {
-  const { minLon, minLat, maxLon, maxLat, green_space_type = 'all' } = args;
+  const { minLon, minLat, maxLon, maxLat, green_space_type = 'all', output_path } = args;
   
   // 入力検証
   validateCommonInputs(args);
@@ -96,20 +101,31 @@ out skel qt;`;
   }
   
   try {
-    const osmData = await overpassClient.query(query);
-    const geojson = osmToGeoJSON(osmData);
-    
-    const response = createGeoJSONResponse(geojson, {
-      green_space_type: green_space_type,
-      bbox: [minLon, minLat, maxLon, maxLat]
+    return await handleQueryWithOptionalFile({
+      overpassClient,
+      query,
+      output_path,
+      dataType: '緑地',
+      metadata: {
+        green_space_type: green_space_type,
+        bbox: [minLon, minLat, maxLon, maxLat]
+      },
+      processResponse: (osmData) => {
+        const geojson = osmToGeoJSON(osmData);
+        
+        const response = createGeoJSONResponse(geojson, {
+          green_space_type: green_space_type,
+          bbox: [minLon, minLat, maxLon, maxLat]
+        });
+        
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify(response, null, 2)
+          }]
+        };
+      }
     });
-    
-    return {
-      content: [{
-        type: 'text',
-        text: JSON.stringify(response, null, 2)
-      }]
-    };
   } catch (error) {
     return {
       content: [{

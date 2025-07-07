@@ -244,6 +244,74 @@ Overpass APIサーバーへの接続をテストします。
 }
 ```
 
+### 8. download_osm_data
+OpenStreetMapデータをファイルにダウンロードします。大きなデータセットも効率的に処理できます。
+
+**パラメータ**:
+- `query` (string, 必須): Overpass QLクエリ
+- `output_path` (string, 必須): 保存先ファイルパス
+- `format` (string, オプション): 出力形式（`json`または`xml`、デフォルト: `json`）
+
+**使用例**:
+```json
+{
+  "query": "[out:json];way[building](35.68,139.76,35.69,139.77);out body;>;out skel qt;",
+  "output_path": "./data/tokyo_buildings.json",
+  "format": "json"
+}
+```
+
+### 9. download_area_buildings
+指定エリアの建物データを直接ファイルにダウンロードします（簡易版）。
+
+**パラメータ**:
+- `minLon`, `minLat`, `maxLon`, `maxLat`: 範囲指定
+- `output_path` (string, 必須): 保存先ファイルパス
+
+**使用例**:
+```json
+{
+  "minLon": 139.765,
+  "minLat": 35.680,
+  "maxLon": 139.770,
+  "maxLat": 35.685,
+  "output_path": "./data/buildings.json"
+}
+```
+
+### 10. download_area_all
+指定エリアの全データ（建物、道路、POIなど）をダウンロードします。
+
+**パラメータ**:
+- `minLon`, `minLat`, `maxLon`, `maxLat`: 範囲指定
+- `output_path` (string, 必須): 保存先ファイルパス
+
+**使用例**:
+```json
+{
+  "minLon": 139.765,
+  "minLat": 35.680,
+  "maxLon": 139.770,
+  "maxLat": 35.685,
+  "output_path": "./data/all_features.json"
+}
+```
+
+### 11. convert_to_geojson
+ダウンロード済みのOSMファイルをGeoJSONに変換します。
+
+**パラメータ**:
+- `input_path` (string, 必須): OSMデータファイルのパス
+- `output_path` (string, 必須): GeoJSON出力ファイルのパス
+
+**使用例**:
+```json
+{
+  "input_path": "./data/tokyo_buildings.json",
+  "output_path": "./data/tokyo_buildings.geojson"
+}
+```
+
 
 ## 出力形式
 

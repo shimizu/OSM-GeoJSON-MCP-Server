@@ -3,6 +3,8 @@
 
 import { validateCommonInputs, validateFilter } from '../utils/validator.js';
 import { osmToGeoJSON, createGeoJSONResponse } from '../utils/converter.js';
+import fs from 'fs/promises';
+import osmtogeojson from 'osmtogeojson';
 
 export const buildingsToolSchema = {
   name: 'get_buildings',
@@ -19,6 +21,10 @@ export const buildingsToolSchema = {
         description: '建物タイプフィルター（オプション）',
         enum: ['residential', 'commercial', 'industrial', 'public', 'all'],
         default: 'all'
+      },
+      output_path: {
+        type: 'string',
+        description: '保存先ファイルパス（オプション）。指定するとファイルに保存、指定しないとJSON応答を返す'
       }
     },
     required: ['minLon', 'minLat', 'maxLon', 'maxLat']
@@ -26,7 +32,7 @@ export const buildingsToolSchema = {
 };
 
 export async function getBuildings(overpassClient, args) {
-  const { minLon, minLat, maxLon, maxLat, building_type = 'all' } = args;
+  const { minLon, minLat, maxLon, maxLat, building_type = 'all', output_path } = args;
   
   // 入力検証
   validateCommonInputs(args);
@@ -51,6 +57,51 @@ out body;
 out skel qt;`;
   
   try {
+    // ファイル出力が指定されている場合
+    if (output_path) {
+      const result = await overpassClient.queryToFile(query, output_path);
+      
+      // OSMデータをGeoJSONに変換する場合
+      if (output_path.endsWith('.geojson')) {
+        const osmData = JSON.parse(await fs.readFile(output_path, 'utf8'));
+        const geojson = osmtogeojson(osmData);
+        await fs.writeFile(output_path, JSON.stringify(geojson, null, 2));
+        
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify({
+              status: 'success',
+              message: '建物データをダウンロードしました',
+              file: output_path,
+              size: result.size,
+              feature_count: geojson.features.length,
+              building_type: building_type,
+              bbox: [minLon, minLat, maxLon, maxLat],
+              server: result.server
+            }, null, 2)
+          }]
+        };
+      }
+      
+      // OSM形式のまま保存
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            status: 'success',
+            message: '建物データをダウンロードしました（OSM形式）',
+            file: output_path,
+            size: result.size,
+            building_type: building_type,
+            bbox: [minLon, minLat, maxLon, maxLat],
+            server: result.server
+          }, null, 2)
+        }]
+      };
+    }
+    
+    // 従来の動作：JSONレスポンスを返す
     const osmData = await overpassClient.query(query);
     const geojson = osmToGeoJSON(osmData);
     

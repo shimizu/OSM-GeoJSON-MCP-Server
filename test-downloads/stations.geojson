@@ -1,0 +1,1586 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "node/1923768928",
+      "properties": {
+        "name": "大手町",
+        "name:en": "Otemachi",
+        "name:es": "Otemachi",
+        "name:fr": "Ōtemachi",
+        "name:ja": "大手町",
+        "name:ja_kana": "おおてまち",
+        "name:ja_rm": "Ōtemachi",
+        "name:ko": "오테마치",
+        "name:ru": "Отэмати",
+        "operator": "東京地下鉄",
+        "platforms": "2",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "T09",
+        "station": "subway",
+        "subway": "yes",
+        "wheelchair": "no",
+        "wikidata": "Q1326767",
+        "wikipedia": "ja:大手町駅 (東京都)",
+        "id": "node/1923768928"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7664613,
+          35.6846087
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/1926277330",
+      "properties": {
+        "name": "大手町",
+        "name:en": "Otemachi",
+        "name:es": "Otemachi",
+        "name:fr": "Ōtemachi",
+        "name:ja": "大手町",
+        "name:ja_kana": "おおてまち",
+        "name:ja_rm": "Ōtemachi",
+        "name:ko": "오테마치",
+        "name:ru": "Отэмати",
+        "network": "東京メトロ",
+        "operator": "東京地下鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "Z08",
+        "source": "survey",
+        "station": "subway",
+        "subway": "yes",
+        "wheelchair": "yes",
+        "wikidata": "Q1326767",
+        "wikipedia": "ja:大手町駅 (東京都)",
+        "id": "node/1926277330"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7650376,
+          35.6866919
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/1926277338",
+      "properties": {
+        "colour": "green",
+        "name": "大手町",
+        "name:en": "Otemachi",
+        "name:es": "Otemachi",
+        "name:fr": "Ōtemachi",
+        "name:ja": "大手町",
+        "name:ja_kana": "おおてまち",
+        "name:ja_rm": "Ōtemachi",
+        "name:ko": "오테마치",
+        "name:ru": "Отэмати",
+        "network": "東京メトロ",
+        "operator": "東京地下鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "C11",
+        "station": "subway",
+        "subway": "yes",
+        "wheelchair": "yes",
+        "wikidata": "Q1326767",
+        "wikipedia": "ja:大手町駅 (東京都)",
+        "id": "node/1926277338"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7636157,
+          35.686757
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/1926376081",
+      "properties": {
+        "name": "永田町",
+        "name:en": "Nagatacho",
+        "name:es": "Nagatacho",
+        "name:ja": "永田町",
+        "name:ja_kana": "ながたちょう",
+        "name:ja_rm": "Nagatachō",
+        "name:ko": "나가타초",
+        "name:ru": "Нагататё",
+        "operator": "東京地下鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "Y16;Z04;N07",
+        "station": "subway",
+        "subway": "yes",
+        "wheelchair": "yes",
+        "wikidata": "Q1142211",
+        "wikipedia": "ja:永田町駅",
+        "id": "node/1926376081"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7415775,
+          35.6779456
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/1926417053",
+      "properties": {
+        "colour": "yellow",
+        "name": "新富町",
+        "name:en": "Shintomicho",
+        "name:es": "Shintomicho",
+        "name:ja": "新富町",
+        "name:ja_kana": "しんとみちょう",
+        "name:ja_rm": "Shintomichō",
+        "name:ru": "Синтомитё",
+        "operator": "東京地下鉄",
+        "operator:ja": "東京地下鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "Y20",
+        "station": "subway",
+        "subway": "yes",
+        "wheelchair": "yes",
+        "wikidata": "Q332002",
+        "wikipedia": "ja:新富町駅 (東京都)",
+        "id": "node/1926417053"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7734197,
+          35.6706344
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/1926703932",
+      "properties": {
+        "alt_name:ko": "미쓰코시마에",
+        "name": "三越前",
+        "name:en": "Mitsukoshimae",
+        "name:es": "Mitsukoshimae",
+        "name:fr": "Mitsukoshimae",
+        "name:ja": "三越前",
+        "name:ja_kana": "みつこしまえ",
+        "name:ja_rm": "Mitsukoshi Mae",
+        "name:ko": "미쓰코시앞",
+        "name:ru": "Мицукосимаэ",
+        "network": "東京メトロ半蔵門線",
+        "note": "Hanzomon Line station, ginza line has a station of the same name.",
+        "operator": "東京地下鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "Z09",
+        "station": "subway",
+        "subway": "yes",
+        "transport": "subway",
+        "wheelchair": "yes",
+        "wikidata": "Q76898",
+        "wikipedia": "ja:三越前駅",
+        "id": "node/1926703932"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7730743,
+          35.6849516
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/2149761647",
+      "properties": {
+        "addr:block_number": "9",
+        "addr:city": "千代田区",
+        "addr:country": "JP",
+        "addr:housenumber": "1",
+        "addr:neighbourhood": "丸の内一丁目",
+        "addr:postcode": "100-0005",
+        "addr:province": "東京都",
+        "full_name": "東京駅",
+        "full_name:en": "Tokyo Station",
+        "full_name:zh": "東京站",
+        "name": "東京",
+        "name:de": "Tokio",
+        "name:en": "Tōkyō",
+        "name:es": "Tokyo",
+        "name:fr": "Tokyo",
+        "name:it": "Tokyo",
+        "name:ja": "東京",
+        "name:ja-Hira": "とうきょう",
+        "name:ja-Latn": "Tōkyō",
+        "name:ko": "도쿄",
+        "name:ru": "Токио",
+        "name:th": "โตเกียว",
+        "name:uk": "Токіо",
+        "name:zh": "東京",
+        "name:zh-Hans": "东京",
+        "name:zh-Hant": "東京",
+        "note": "This station is for non-high speed train (在来線 or zairaisen), such as chuo line, tokaido line, keihin tohoku line, yamanote line",
+        "note:language": "\"name=Japanese (English)\" is wrong. Japanese only. 「name=日本語 (英語)」はダメです。",
+        "note:operator": "\"JR\" is wrong. \"JR\" はダメです。National-Land Numerical Information (Railway) 2007, MLIT Japan.",
+        "operator": "東日本旅客鉄道",
+        "operator:en": "East Japan Railway",
+        "operator:ja": "東日本旅客鉄道",
+        "operator:ja_rm": "Higashi-Nihon Ryokaku Tetsudō",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "TYO",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "train": "yes",
+        "usage": "main",
+        "voltage": "1500",
+        "wheelchair": "yes",
+        "wikidata": "Q283196",
+        "wikipedia": "ja:東京駅",
+        "id": "node/2149761647"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.766706,
+          35.6812546
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/2558121955",
+      "properties": {
+        "name": "有楽町",
+        "name:en": "Yurakucho",
+        "name:es": "Yurakucho",
+        "name:fr": "Yūrakuchō",
+        "name:it": "Yurakucho",
+        "name:ja": "有楽町",
+        "name:ja-Hira": "ゆうらくちょう",
+        "name:ja-Latn": "Yūrakuchō",
+        "name:ko": "유라쿠초",
+        "name:ru": "Юракутё",
+        "name:th": "ยูราคุโจ",
+        "operator": "東日本旅客鉄道",
+        "public_transport": "station",
+        "railway": "station",
+        "wheelchair": "yes",
+        "wikidata": "Q801655",
+        "wikipedia": "ja:有楽町駅",
+        "id": "node/2558121955"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7631061,
+          35.6748872
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/2730655241",
+      "properties": {
+        "name": "茅場町",
+        "name:en": "Kayabacho",
+        "name:es": "Kayabacho",
+        "name:ja": "茅場町",
+        "name:ja_kana": "かやばちょう",
+        "name:ja_rm": "Kayabachō",
+        "name:ko": "가야바초",
+        "name:ru": "Кайабатё",
+        "operator": "東京地下鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "T11",
+        "station": "subway",
+        "subway": "yes",
+        "transport": "subway",
+        "wheelchair": "limited",
+        "wikidata": "Q80566",
+        "wikipedia": "ja:茅場町駅",
+        "id": "node/2730655241"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7794236,
+          35.6802291
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/4536777489",
+      "properties": {
+        "amenity": "bus_station",
+        "bus": "yes",
+        "name": "JR高速バスのりば",
+        "name:en": "Tokyo Station JR Express Bus Terminal",
+        "name:ja": "東京駅JR高速バスターミナル",
+        "name:zh": "東京站JR高速巴士總站",
+        "public_transport": "station",
+        "wheelchair": "yes",
+        "id": "node/4536777489"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7680596,
+          35.6797924
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/4623629389",
+      "properties": {
+        "amenity": "bus_station",
+        "bus": "yes",
+        "name:en": "marital Aeropostale",
+        "name:it": "Marital Aeropostale",
+        "public_transport": "station",
+        "wheelchair": "yes",
+        "id": "node/4623629389"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7638327,
+          35.6730266
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/4646514990",
+      "properties": {
+        "amenity": "bus_station",
+        "bus": "yes",
+        "name": "東京駅八重洲北口鉄鋼ビル",
+        "name:en": "Tokyo Shuttle",
+        "name:ja": "東京駅八重洲北口鉄鋼ビル",
+        "public_transport": "station",
+        "wheelchair": "yes",
+        "id": "node/4646514990"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7696216,
+          35.6816961
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/5408257692",
+      "properties": {
+        "name": "日本橋",
+        "name:en": "Nihombashi",
+        "name:es": "Nihombashi",
+        "name:ja": "日本橋",
+        "public_transport": "station",
+        "railway": "station",
+        "station": "subway",
+        "subway": "yes",
+        "wheelchair": "yes",
+        "id": "node/5408257692"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7744933,
+          35.6822079
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/5409192473",
+      "properties": {
+        "name": "大手町",
+        "name:en": "Otemachi",
+        "name:es": "Otemachi",
+        "name:ja": "大手町",
+        "name:ko": "오테마치",
+        "network": "都営地下鉄",
+        "network:en": "Toei subway",
+        "operator": "東京都交通局",
+        "operator:en": "Toei",
+        "operator:wikidata": "Q1377135",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "I09",
+        "station": "subway",
+        "subway": "yes",
+        "wikidata": "Q1326767",
+        "wikipedia": "ja:大手町駅 (東京都)",
+        "id": "node/5409192473"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7626637,
+          35.6840162
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/5843991686",
+      "properties": {
+        "amenity": "bus_station",
+        "bus": "yes",
+        "name": "THEアクセス成田",
+        "name:en": "THE Access Narita",
+        "name:es": "THE Access Narita",
+        "public_transport": "station",
+        "id": "node/5843991686"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7637189,
+          35.6730368
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6191130324",
+      "properties": {
+        "name": "日比谷",
+        "name:en": "Hibiya",
+        "name:es": "Hibiya",
+        "name:fr": "Hibiya",
+        "name:ja": "日比谷",
+        "name:ja_kana": "ひびや",
+        "name:ja_rm": "Hibiya",
+        "name:ko": "히비야",
+        "name:ru": "Хибия",
+        "network": "東京メトロ",
+        "operator": "東京地下鉄;東京都交通局",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "C09",
+        "source": "Survey",
+        "station": "subway",
+        "subway": "yes",
+        "wheelchair": "yes",
+        "wikidata": "Q511753",
+        "wikipedia": "ja:日比谷駅",
+        "id": "node/6191130324"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7583499,
+          35.6737302
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6192618377",
+      "properties": {
+        "colour": "yellow",
+        "internet_access": "wlan",
+        "internet_access:fee": "no",
+        "internet_access:ssid": "Metro_Free_Wi-Fi",
+        "name": "桜田門",
+        "name:en": "Sakuradamon",
+        "name:es": "Sakuradamon",
+        "name:ja": "桜田門",
+        "name:ja_kana": "さくらだもん",
+        "name:ja_rm": "Sakudaramon",
+        "name:ko": "사쿠라다몬",
+        "name:ru": "Сакурадамон",
+        "network": "東京メトロ有楽町線",
+        "operator": "東京地下鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "Y17",
+        "station": "subway",
+        "subway": "yes",
+        "wheelchair": "yes",
+        "wikidata": "Q277196",
+        "wikipedia": "ja:桜田門駅",
+        "id": "node/6192618377"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7515757,
+          35.6774009
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6193465461",
+      "properties": {
+        "name": "日比谷",
+        "name:en": "Hibiya",
+        "name:es": "Hibiya",
+        "name:fr": "Hibiya",
+        "name:ja": "日比谷",
+        "name:ja_kana": "ひびや",
+        "name:ja_rm": "Hibiya",
+        "name:ko": "히비야",
+        "name:ru": "Хибия",
+        "network": "都営地下鉄",
+        "operator": "東京地下鉄;東京都交通局",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "I08",
+        "source": "Survey",
+        "station": "subway",
+        "subway": "yes",
+        "transport": "subway",
+        "wheelchair": "yes",
+        "wikidata": "Q511753",
+        "wikipedia": "ja:日比谷駅",
+        "id": "node/6193465461"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7601969,
+          35.6762399
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6193611538",
+      "properties": {
+        "colour": "yellow",
+        "name": "有楽町",
+        "name:en": "Yurakucho",
+        "name:es": "Yurakucho",
+        "name:fr": "Yūrakuchō",
+        "name:ja": "有楽町",
+        "name:ja_kana": "ゆうらくちょう",
+        "name:ja_rm": "Yūrakuchō",
+        "name:ko": "유라쿠초",
+        "name:ru": "Юракутё",
+        "network": "東京メトロ有楽町線",
+        "operator": "東京地下鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "Y18",
+        "station": "subway",
+        "subway": "yes",
+        "transport": "subway",
+        "wheelchair": "no",
+        "wikidata": "Q801655",
+        "wikipedia": "ja:有楽町駅",
+        "id": "node/6193611538"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7621359,
+          35.6759691
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6193732167",
+      "properties": {
+        "internet_access": "wlan",
+        "name": "東京",
+        "name:ar": "طوكيو",
+        "name:ast": "Tokio",
+        "name:ca": "Tòquio",
+        "name:ckb": "تۆکیۆ",
+        "name:cs": "Tokio",
+        "name:cy": "Tokyo",
+        "name:da": "Tokyo",
+        "name:de": "Tokio",
+        "name:el": "Τόκιο",
+        "name:en": "Tokyo",
+        "name:eo": "Tokio",
+        "name:es": "Tokio",
+        "name:et": "Tōkyō",
+        "name:fa": "توکیو",
+        "name:fi": "Tokio",
+        "name:fr": "Tokyo",
+        "name:he": "טוקיו",
+        "name:hr": "Tokio",
+        "name:hu": "Tokió",
+        "name:ia": "Tokyo",
+        "name:io": "Tokyo",
+        "name:is": "Tókýó",
+        "name:it": "Tokyo",
+        "name:ja": "東京",
+        "name:ja_kana": "とうきょう",
+        "name:ja_rm": "Tōkyō",
+        "name:jbo": ".tokios.",
+        "name:kn": "ಟೋಕ್ಯೊ",
+        "name:ko": "도쿄도",
+        "name:ku": "Tokyo",
+        "name:lb": "Tokio",
+        "name:lt": "Tokijas",
+        "name:lv": "Tokija",
+        "name:nan": "Tang-kiaⁿ",
+        "name:nl": "Tokio",
+        "name:oc": "Tòquio",
+        "name:pap": "Tokyo",
+        "name:pl": "Tokio",
+        "name:pt": "Tóquio",
+        "name:ru": "Токио",
+        "name:sk": "Tokio",
+        "name:sl": "Tokio",
+        "name:sr": "Токио",
+        "name:sv": "Tokyo",
+        "name:szl": "Tokjo",
+        "name:ta": "டோக்கியோ",
+        "name:tg": "Токио",
+        "name:th": "โตเกียว",
+        "name:tr": "Tokyo",
+        "name:uk": "Токіо",
+        "name:vi": "Tokyo",
+        "name:wuu": "东京",
+        "name:yue": "東京",
+        "name:zh": "东京",
+        "name:zh-Hans": "东京",
+        "name:zh-Hant": "東京",
+        "network": "東京メトロ丸ノ内線",
+        "operator": "東京地下鉄",
+        "phone": "+81 3 32515652",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "M17",
+        "station": "subway",
+        "subway": "yes",
+        "website": "https://www.tokyometro.jp/lang_en/station/tokyo/",
+        "wheelchair": "yes",
+        "id": "node/6193732167"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7649584,
+          35.6820173
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6195254304",
+      "properties": {
+        "colour": "green",
+        "name": "霞ケ関",
+        "name:en": "Kasumigaseki",
+        "name:es": "Kasumigaseki",
+        "name:fr": "Kasumigaseki",
+        "name:ja": "霞ケ関",
+        "name:ja_kana": "かすみがせき",
+        "name:ja_rm": "Kasumigaseki",
+        "name:ko": "가스미가세키",
+        "name:ru": "Касумигасэки",
+        "network": "千代田線",
+        "operator": "東京地下鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "C08",
+        "source": "Survey",
+        "station": "subway",
+        "subway": "yes",
+        "wheelchair": "yes",
+        "wikidata": "Q741614",
+        "wikipedia": "ja:霞ケ関駅 (東京都)",
+        "id": "node/6195254304"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7516221,
+          35.6725014
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6196655597",
+      "properties": {
+        "colour": "gray",
+        "name": "霞ケ関",
+        "name:en": "Kasumigaseki",
+        "name:es": "Kasumigaseki",
+        "name:ja": "霞ケ関",
+        "name:ja_kana": "かすみがせき",
+        "name:ja_rm": "Kasumigaseki",
+        "name:ko": "가스미가세키",
+        "name:ru": "Касумигасэки",
+        "network": "東京メト",
+        "note": "日比谷線",
+        "operator": "東京地下鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "H06",
+        "station": "subway",
+        "subway": "yes",
+        "wheelchair": "yes",
+        "wikidata": "Q741614",
+        "wikipedia": "ja:霞ケ関駅 (東京都)",
+        "id": "node/6196655597"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7510565,
+          35.6738544
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6198306276",
+      "properties": {
+        "colour": "red",
+        "name": "霞ケ関",
+        "name:en": "Kasumigaseki",
+        "name:es": "Kasumigaseki",
+        "name:ja": "霞ケ関",
+        "name:ja_kana": "かすみがせき",
+        "name:ja_rm": "Kasumigaseki",
+        "name:ko": "가스미가세키",
+        "name:ru": "Касумигасэки",
+        "note": "丸ノ内線",
+        "operator": "東京地下鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "M15",
+        "station": "subway",
+        "subway": "yes",
+        "wheelchair": "yes",
+        "wikidata": "Q741614",
+        "wikipedia": "ja:霞ケ関駅 (東京都)",
+        "id": "node/6198306276"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7527174,
+          35.674217
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6202341257",
+      "properties": {
+        "alt_name:ko": "곳카이기지도마에",
+        "colour": "green",
+        "internet_access": "wlan",
+        "internet_access:fee": "no",
+        "internet_access:ssid": "Metro_Free_Wi-Fi",
+        "name": "国会議事堂前",
+        "name:en": "Kokkai-gijidomae",
+        "name:es": "Kokkai-gijidomae",
+        "name:ja": "国会議事堂前",
+        "name:ja_kana": "こっかいぎじどうまえ",
+        "name:ja_rm": "Kokkai gijidō mae",
+        "name:ko": "국회의사당앞",
+        "name:ru": "Коккай Гидзидомаэ",
+        "network": "千代田線, 丸ノ内線, 銀座線, 南北線",
+        "operator": "東京地下鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "C07",
+        "source": "Survey",
+        "station": "subway",
+        "subway": "yes",
+        "wheelchair": "yes",
+        "wikidata": "Q1192508",
+        "wikipedia": "ja:国会議事堂前駅",
+        "id": "node/6202341257"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7434262,
+          35.6736889
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6202373220",
+      "properties": {
+        "name": "溜池山王",
+        "name:en": "Tameike-sanno",
+        "name:es": "Tameike-sanno",
+        "name:ja": "溜池山王",
+        "name:ja_kana": "ためいけさんのう",
+        "name:ja_rm": "Tameike San-nō",
+        "name:ko": "다메이케산노",
+        "name:ru": "Тамэикэ Санно",
+        "operator": "東京地下鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "N06",
+        "station": "subway",
+        "subway": "yes",
+        "wheelchair": "yes",
+        "wikidata": "Q277208",
+        "wikipedia": "ja:溜池山王駅",
+        "id": "node/6202373220"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.741424,
+          35.6729903
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6203282789",
+      "properties": {
+        "colour": "orange",
+        "name": "溜池山王",
+        "name:en": "Tameike-sanno",
+        "name:es": "Tameike-sanno",
+        "name:ja": "溜池山王",
+        "name:ja_kana": "ためいけさんのう",
+        "name:ja_rm": "Tameike San-nō",
+        "name:ko": "다메이케산노",
+        "name:ru": "Тамэикэ Санно",
+        "name:zh": "溜池山王",
+        "operator": "東京地下鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "G06",
+        "station": "subway",
+        "subway": "yes",
+        "wikidata": "Q277208",
+        "wikipedia": "ja:溜池山王駅",
+        "id": "node/6203282789"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.741961,
+          35.6715337
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6206669779",
+      "properties": {
+        "name": "二重橋前〈丸の内〉",
+        "name:en": "Nijubashimae 'Marunouchi'",
+        "name:es": "Nijubashimae 'Marunouchi'",
+        "name:ja_kana": "にじゅうばしまえ〈まるのうち〉",
+        "name:ja_rm": "Nijūbashi mae",
+        "name:ru": "Нидзюбасимаэ",
+        "network": "千代田線",
+        "operator": "東京地下鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "C10",
+        "source": "Survey",
+        "station": "subway",
+        "transport": "subway",
+        "wheelchair": "limited",
+        "wikidata": "Q390676",
+        "wikipedia": "ja:二重橋前駅",
+        "id": "node/6206669779"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7616161,
+          35.6803213
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6208064122",
+      "properties": {
+        "name": "半蔵門",
+        "name:en": "Hanzomon",
+        "name:es": "Hanzomon",
+        "name:ja": "半蔵門",
+        "name:ja_kana": "はんぞうもん",
+        "name:ja_rm": "Hanzōmon",
+        "name:ko": "한조몬",
+        "name:ru": "Хандзомон",
+        "operator": "東京地下鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "Z05",
+        "station": "subway",
+        "subway": "yes",
+        "wheelchair": "yes",
+        "wikidata": "Q80551",
+        "wikipedia": "ja:半蔵門駅",
+        "id": "node/6208064122"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7415832,
+          35.6852213
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6231304485",
+      "properties": {
+        "internet_access": "wlan",
+        "internet_access:fee": "no",
+        "internet_access:ssid": "Metro_Free_Wi-Fi",
+        "name": "日比谷",
+        "name:en": "Hibiya",
+        "name:es": "Hibiya",
+        "name:ja": "日比谷",
+        "network": "日比谷線",
+        "operator": "東京地下鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "H07",
+        "station": "subway",
+        "subway": "yes",
+        "transport": "subway",
+        "wheelchair": "yes",
+        "id": "node/6231304485"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.760332,
+          35.6744172
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6240689967",
+      "properties": {
+        "colour": "orange",
+        "name": "日本橋",
+        "name:en": "Nihombashi",
+        "name:es": "Nihombashi",
+        "name:ja": "日本橋",
+        "name:ja_kana": "にほんばし",
+        "name:ja_rm": "Nihombashi",
+        "name:ko": "니혼바시",
+        "name:ru": "Нихонбаси",
+        "name:zh": "日本橋",
+        "note": "銀座線",
+        "operator": "東京地下鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "G11",
+        "station": "subway",
+        "subway": "yes",
+        "transport": "subway",
+        "wikidata": "Q775847",
+        "wikipedia": "ja:日本橋駅 (東京都)",
+        "id": "node/6240689967"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7733976,
+          35.6820843
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6240710301",
+      "properties": {
+        "name": "日本橋",
+        "name:en": "Nihombashi",
+        "name:es": "Nihombashi",
+        "name:ja": "日本橋",
+        "name:ja_kana": "にほんばし",
+        "name:ja_rm": "Nihombashi",
+        "name:ko": "니혼바시",
+        "name:ru": "Нихонбаси",
+        "network": "都営地下鉄",
+        "network:en": "Toei subway",
+        "note": "浅草線",
+        "operator": "東京都交通局",
+        "operator:en": "Toei",
+        "operator:wikidata": "Q1377135",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "A13",
+        "station": "subway",
+        "subway": "yes",
+        "wikidata": "Q775847",
+        "wikipedia": "ja:日本橋駅 (東京都)",
+        "id": "node/6240710301"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7758101,
+          35.6818307
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6242231340",
+      "properties": {
+        "alt_name:ko": "미쓰코시마에",
+        "colour": "orange",
+        "name": "三越前",
+        "name:en": "Mitsukoshimae",
+        "name:es": "Mitsukoshimae",
+        "name:fr": "Mitsukoshimae",
+        "name:ja": "三越前",
+        "name:ja_kana": "みつこしまえ",
+        "name:ja_rm": "Mitsukoshi Mae",
+        "name:ko": "미쓰코시앞",
+        "name:ru": "Мицукосимаэ",
+        "name:zh": "三越前",
+        "network": "Tokyo Metro Ginza Line",
+        "operator": "東京地下鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "G12",
+        "station": "subway",
+        "subway": "yes",
+        "transport": "subway",
+        "wheelchair": "yes",
+        "wikidata": "Q76898",
+        "wikipedia": "ja:三越前駅",
+        "id": "node/6242231340"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7736283,
+          35.687054
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6271990033",
+      "properties": {
+        "name": "銀座",
+        "name:en": "Ginza",
+        "name:es": "Ginza",
+        "name:fr": "Ginza",
+        "name:ja": "銀座",
+        "name:ja_kana": "ぎんざ",
+        "name:ja_rm": "Ginza",
+        "name:ru": "Гиндза",
+        "operator": "東京地下鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "M16",
+        "station": "subway",
+        "subway": "yes",
+        "wheelchair": "yes",
+        "wikidata": "Q602372",
+        "wikipedia": "ja:銀座駅",
+        "id": "node/6271990033"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7631029,
+          35.6728411
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6272010117",
+      "properties": {
+        "colour": "gray",
+        "name": "銀座",
+        "name:en": "Ginza",
+        "name:es": "Ginza",
+        "name:fr": "Ginza",
+        "name:ja": "銀座",
+        "name:ja_kana": "ぎんざ",
+        "name:ja_rm": "Ginza",
+        "name:ru": "Гиндза",
+        "operator": "東京地下鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "H08",
+        "station": "subway",
+        "subway": "yes",
+        "wheelchair": "limited",
+        "wikidata": "Q602372",
+        "wikipedia": "ja:銀座駅",
+        "id": "node/6272010117"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7638932,
+          35.6720707
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6272039605",
+      "properties": {
+        "colour": "orange",
+        "name": "銀座",
+        "name:en": "Ginza",
+        "name:es": "Ginza",
+        "name:fr": "Ginza",
+        "name:ja": "銀座",
+        "name:ja_kana": "ぎんざ",
+        "name:ja_rm": "Ginza",
+        "name:ru": "Гиндза",
+        "name:zh": "銀座",
+        "operator": "東京地下鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "G09",
+        "station": "subway",
+        "subway": "yes",
+        "wikidata": "Q602372",
+        "wikipedia": "ja:銀座駅",
+        "id": "node/6272039605"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7652995,
+          35.6714622
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6333133527",
+      "properties": {
+        "alt_name:en": "Ginza 1-chome",
+        "colour": "yellow",
+        "name": "銀座一丁目",
+        "name:en": "Ginza-itchome",
+        "name:es": "Ginza-itchome",
+        "name:ja": "銀座一丁目",
+        "name:ja_kana": "ぎんざいっちょうめ",
+        "name:ja_rm": "Ginza Itchōme",
+        "name:ko": "긴자1초메",
+        "name:ru": "Гиндза Иттёмэ",
+        "operator": "東京地下鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "Y19",
+        "station": "subway",
+        "subway": "yes",
+        "transport": "subway",
+        "wheelchair": "no",
+        "wikidata": "Q331185",
+        "wikipedia": "ja:銀座一丁目駅",
+        "id": "node/6333133527"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7670332,
+          35.6743469
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6449441183",
+      "properties": {
+        "maxspeed": "100",
+        "name": "八丁堀",
+        "name:en": "Hatchōbori",
+        "name:es": "Hatchōbori",
+        "name:ja": "八丁堀",
+        "name:ja-Kana": "はっちょうぼり",
+        "name:ja-Latn": "Hatchōbori",
+        "name:ko": "핫초보리",
+        "name:ru": "Хаттёбори",
+        "operator": "東日本旅客鉄道",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "JE02",
+        "usage": "main",
+        "website": "https://www.jreast.co.jp/estation/station/info.aspx?StationCd=1236",
+        "wheelchair": "limited",
+        "wikidata": "Q1073008",
+        "wikipedia": "ja:八丁堀駅 (東京都)",
+        "id": "node/6449441183"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7776565,
+          35.6746238
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/7196177600",
+      "properties": {
+        "amenity": "ferry_terminal",
+        "cargo": "passengers",
+        "ferry": "yes",
+        "name": "日本橋観光桟橋",
+        "name:en": "Nihonbashi Tourist Pier",
+        "name:ja-Latn": "Nihonbashi Kankō Sanbashi",
+        "operator": "(株)東京湾クルージング",
+        "public_transport": "station",
+        "id": "node/7196177600"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7748102,
+          35.6838198
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/7786715954",
+      "properties": {
+        "colour": "orange",
+        "name": "京橋",
+        "name:en": "Kyobashi",
+        "name:es": "Kyobashi",
+        "name:ja": "京橋",
+        "name:ja_kana": "きょうばし",
+        "name:ja_rm": "Kyōbashi",
+        "name:ko": "교바시",
+        "name:ru": "Кёбаси",
+        "name:zh": "京橋",
+        "operator": "東京地下鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "G10",
+        "station": "subway",
+        "subway": "yes",
+        "transport": "subway",
+        "wheelchair": "yes",
+        "wikidata": "Q347981",
+        "wikipedia": "ja:京橋駅 (東京都)",
+        "id": "node/7786715954"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7700412,
+          35.676696
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/7786715964",
+      "properties": {
+        "colour": "red",
+        "name": "国会議事堂前",
+        "name:en": "Kokkai-gijidomae",
+        "name:es": "Kokkai-gijidomae",
+        "name:ja": "国会議事堂前",
+        "name:ja_kana": "こっかいぎじどうまえ",
+        "name:ja_rm": "Kokkai gijidō mae",
+        "name:ko": "곳카이기지도마에",
+        "name:ru": "Коккай Гидзидомаэ",
+        "name:zh": "國會議事堂前站",
+        "note": "丸ノ内線",
+        "operator": "東京地下鉄",
+        "platforms": "2",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "M14",
+        "station": "subway",
+        "subway": "yes",
+        "wheelchair": "yes",
+        "wikidata": "Q1192508",
+        "wikipedia": "ja:国会議事堂前駅",
+        "id": "node/7786715964"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7455534,
+          35.6745485
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/7786715966",
+      "properties": {
+        "name": "大手町",
+        "name:en": "Otemachi",
+        "name:es": "Otemachi",
+        "name:fr": "Ōtemachi",
+        "name:ja": "大手町",
+        "name:ja_kana": "おおてまち",
+        "name:ja_rm": "Ōtemachi",
+        "name:ko": "오테마치",
+        "name:ru": "Отэмати",
+        "operator": "東京地下鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "M18",
+        "station": "subway",
+        "subway": "yes",
+        "wheelchair": "yes",
+        "wikidata": "Q1326767",
+        "wikipedia": "ja:大手町駅 (東京都)",
+        "id": "node/7786715966"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7662244,
+          35.6867882
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/7786715969",
+      "properties": {
+        "colour": "orange",
+        "name": "虎ノ門",
+        "name:en": "Toranomon",
+        "name:es": "Toranomon",
+        "name:ja": "虎ノ門",
+        "name:ja_kana": "とらのもん",
+        "name:ja_rm": "Toranomon",
+        "name:ko": "도라노몬",
+        "name:ru": "Тораномон",
+        "name:zh": "虎之門",
+        "network": "ロ銀座線",
+        "operator": "東京地下鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "G07",
+        "station": "subway",
+        "subway": "yes",
+        "wheelchair": "no",
+        "wikidata": "Q347972",
+        "wikipedia": "ja:虎ノ門駅",
+        "id": "node/7786715969"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.750056,
+          35.6701871
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/7786715978",
+      "properties": {
+        "colour": "gray",
+        "name": "八丁堀",
+        "name:en": "Hatchobori",
+        "name:es": "Hatchobori",
+        "name:fr": "Hatchobori",
+        "name:ja": "八丁堀",
+        "name:ja_kana": "はっちょうぼり",
+        "name:ja_rm": "Hatchōbori",
+        "name:ko": "핫초보리",
+        "name:ru": "Хаттёбори",
+        "operator": "東京地下鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "H12",
+        "station": "subway",
+        "subway": "yes",
+        "transport": "subway",
+        "wikidata": "Q1073008",
+        "wikipedia": "ja:八丁堀駅 (東京都)",
+        "id": "node/7786715978"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7770726,
+          35.6750004
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/7786715979",
+      "properties": {
+        "name": "茅場町",
+        "name:en": "Kayabacho",
+        "name:es": "Kayabacho",
+        "name:ja": "茅場町",
+        "name:ja_kana": "かやばちょう",
+        "name:ja_rm": "Kayabachō",
+        "name:ko": "가야바초",
+        "name:ru": "Кайабатё",
+        "operator": "東京地下鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "H13",
+        "station": "subway",
+        "subway": "yes",
+        "transport": "subway",
+        "wikidata": "Q80566",
+        "wikipedia": "ja:茅場町駅",
+        "id": "node/7786715979"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.779738,
+          35.6792567
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/7791591078",
+      "properties": {
+        "name": "宝町",
+        "name:en": "Takaracho",
+        "name:es": "Takaracho",
+        "name:ja": "宝町",
+        "name:ja_kana": "たからちょう",
+        "name:ja_rm": "Takarachō",
+        "name:ko": "다카라초",
+        "name:ru": "Такаратё",
+        "network": "都営地下鉄",
+        "network:en": "Toei subway",
+        "operator": "東京都交通局",
+        "operator:en": "Toei",
+        "operator:wikidata": "Q1377135",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "A12",
+        "station": "subway",
+        "subway": "yes",
+        "wikidata": "Q1040938",
+        "wikipedia": "ja:宝町駅 (東京都)",
+        "id": "node/7791591078"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7718846,
+          35.6754339
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/7942251386",
+      "properties": {
+        "name": "新日本橋",
+        "name:en": "Shin-Nihombashi",
+        "name:es": "Shin-Nihombashi",
+        "name:it": "Shin-Nihombashi",
+        "name:ja": "新日本橋",
+        "name:ja-Hira": "しんにほんばし",
+        "name:ja-Latn": "Shin Nihombashi",
+        "name:ko": "신니혼바시",
+        "name:ru": "Син-Нихомбаси",
+        "operator": "東日本旅客鉄道",
+        "public_transport": "station",
+        "railway": "station",
+        "voltage": "1500",
+        "wikidata": "Q844148",
+        "wikipedia": "ja:新日本橋駅",
+        "id": "node/7942251386"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7741939,
+          35.6890005
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/11329319854",
+      "properties": {
+        "highspeed": "yes",
+        "name": "東京",
+        "name:en": "Tokyo",
+        "name:ja": "東京",
+        "name:ko": "도쿄",
+        "name:zh": "東京",
+        "name:zh-Hans": "东京",
+        "name:zh-Hant": "東京",
+        "note": "This station is for JRE operated high speed train (新幹線 or shinkansen), such as joetsu shinkansen line, tohoku shinkansen line",
+        "operator": "東日本旅客鉄道",
+        "operator:en": "East Japan Railway Company",
+        "public_transport": "station",
+        "railway": "station",
+        "wheelchair": "yes",
+        "id": "node/11329319854"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7674549,
+          35.6811412
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/11329319855",
+      "properties": {
+        "highspeed": "yes",
+        "name": "東京",
+        "name:en": "Tokyo",
+        "name:ja": "東京",
+        "name:ko": "도쿄",
+        "name:zh": "東京",
+        "name:zh-Hans": "东京",
+        "name:zh-Hant": "東京",
+        "note": "This station is for JRC operated high speed train (新幹線 or shinkansen), such as tokaido shinkansen line",
+        "operator": "東海旅客鉄道",
+        "operator:en": "Central Japan Railway Company",
+        "public_transport": "station",
+        "railway": "station",
+        "id": "node/11329319855"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7679859,
+          35.6809626
+        ]
+      }
+    }
+  ]
+}

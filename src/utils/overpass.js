@@ -2,6 +2,9 @@
 // Overpass API通信ユーティリティ
 
 import https from 'https';
+import fs from 'fs/promises';
+import path from 'path';
+import { createWriteStream } from 'fs';
 
 export class OverpassClient {
   constructor() {
@@ -140,5 +143,97 @@ export class OverpassClient {
     }
     
     return results;
+  }
+
+  // ファイルへの直接ダウンロード機能
+  async queryToFile(queryString, outputPath) {
+    return new Promise(async (resolve, reject) => {
+      let lastError = null;
+      
+      // ディレクトリを作成
+      const dir = path.dirname(outputPath);
+      await fs.mkdir(dir, { recursive: true });
+      
+      // 現在のサーバーから順番に試す
+      for (let i = 0; i < this.servers.length; i++) {
+        const serverIndex = (this.currentServerIndex + i) % this.servers.length;
+        const server = this.servers[serverIndex];
+        
+        try {
+          console.error(`Downloading from ${server.host} to ${outputPath}...`);
+          
+          const urlObj = new URL(server.url);
+          const options = {
+            hostname: urlObj.hostname,
+            port: 443,
+            path: urlObj.pathname,
+            method: 'POST',
+            headers: {
+              'Content-Type': 'text/plain',
+              'Content-Length': Buffer.byteLength(queryString),
+              'User-Agent': 'OSM-MCP/1.0',
+              'Host': server.host
+            },
+            rejectUnauthorized: false,
+            timeout: 300000  // 5分のタイムアウト
+          };
+          
+          const result = await new Promise((resolveReq, rejectReq) => {
+            const req = https.request(options, (res) => {
+              if (res.statusCode !== 200) {
+                rejectReq(new Error(`HTTP ${res.statusCode}: ${res.statusMessage}`));
+                return;
+              }
+              
+              const writeStream = createWriteStream(outputPath);
+              let downloadedBytes = 0;
+              
+              res.on('data', (chunk) => {
+                downloadedBytes += chunk.length;
+                if (downloadedBytes % (1024 * 1024) === 0) {
+                  console.error(`Downloaded: ${(downloadedBytes / 1024 / 1024).toFixed(1)} MB`);
+                }
+              });
+              
+              res.pipe(writeStream);
+              
+              writeStream.on('finish', () => {
+                const sizeMB = (downloadedBytes / 1024 / 1024).toFixed(2);
+                resolveReq({
+                  success: true,
+                  path: outputPath,
+                  size: `${sizeMB} MB`,
+                  bytes: downloadedBytes,
+                  server: server.host
+                });
+              });
+              
+              writeStream.on('error', rejectReq);
+            });
+            
+            req.on('error', rejectReq);
+            req.setTimeout(300000);
+            req.write(queryString);
+            req.end();
+          });
+          
+          // 成功したサーバーを記憶
+          this.currentServerIndex = serverIndex;
+          resolve(result);
+          return;
+          
+        } catch (error) {
+          lastError = error;
+          console.error(`Failed with ${server.host}: ${error.message}`);
+          
+          // レート制限の場合は少し待つ
+          if (error.message.includes('429')) {
+            await new Promise(resolve => setTimeout(resolve, 5000));
+          }
+        }
+      }
+      
+      reject(new Error(`All servers failed. Last error: ${lastError?.message}`));
+    });
   }
 }

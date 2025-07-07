@@ -8,6 +8,8 @@ import { testConnectionToolSchema, testConnection } from './test_connection.js';
 import { waterwaysToolSchema, getWaterways } from './waterways.js';
 import { greenspacesToolSchema, getGreenSpaces } from './greenspaces.js';
 import { railwaysToolSchema, getRailways } from './railways.js';
+import { downloadOSMDataSchema, downloadAreaBuildingsSchema, downloadAreaAllSchema, downloadOSMData, downloadAreaBuildings, downloadAreaAll } from './download.js';
+import { convertToGeoJSONSchema, convertToGeoJSON } from './convert.js';
 
 // すべてのツールスキーマをエクスポート
 export const toolSchemas = [
@@ -17,7 +19,11 @@ export const toolSchemas = [
   testConnectionToolSchema,
   waterwaysToolSchema,
   greenspacesToolSchema,
-  railwaysToolSchema
+  railwaysToolSchema,
+  downloadOSMDataSchema,
+  downloadAreaBuildingsSchema,
+  downloadAreaAllSchema,
+  convertToGeoJSONSchema
 ];
 
 // ツール実行関数のマッピング
@@ -28,7 +34,11 @@ export const toolHandlers = {
   'test_connection': testConnection,
   'get_waterways': getWaterways,
   'get_green_spaces': getGreenSpaces,
-  'get_railways': getRailways
+  'get_railways': getRailways,
+  'download_osm_data': downloadOSMData,
+  'download_area_buildings': downloadAreaBuildings,
+  'download_area_all': downloadAreaAll,
+  'convert_to_geojson': convertToGeoJSON
 };
 
 // ツール実行のディスパッチャー

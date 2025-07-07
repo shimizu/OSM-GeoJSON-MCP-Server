@@ -3,6 +3,7 @@
 
 import { validateCommonInputs } from '../utils/validator.js';
 import { osmToGeoJSON, createGeoJSONResponse } from '../utils/converter.js';
+import { handleQueryWithOptionalFile } from '../utils/file-handler.js';
 
 export const amenitiesToolSchema = {
   name: 'get_amenities',
@@ -18,6 +19,10 @@ export const amenitiesToolSchema = {
         type: 'string',
         description: 'アメニティタイプ（例: restaurant, hospital, school, bank, cafe）',
         default: 'all'
+      },
+      output_path: {
+        type: 'string',
+        description: '保存先ファイルパス（オプション）。指定するとファイルに保存、指定しないとJSON応答を返す'
       }
     },
     required: ['minLon', 'minLat', 'maxLon', 'maxLat']
@@ -25,7 +30,7 @@ export const amenitiesToolSchema = {
 };
 
 export async function getAmenities(overpassClient, args) {
-  const { minLon, minLat, maxLon, maxLat, amenity_type = 'all' } = args;
+  const { minLon, minLat, maxLon, maxLat, amenity_type = 'all', output_path } = args;
   
   // 入力検証
   validateCommonInputs(args);
@@ -42,20 +47,31 @@ export async function getAmenities(overpassClient, args) {
 out body;`;
   
   try {
-    const osmData = await overpassClient.query(query);
-    const geojson = osmToGeoJSON(osmData);
-    
-    const response = createGeoJSONResponse(geojson, {
-      amenity_type: amenity_type,
-      bbox: [minLon, minLat, maxLon, maxLat]
+    return await handleQueryWithOptionalFile({
+      overpassClient,
+      query,
+      output_path,
+      dataType: 'アメニティ',
+      metadata: {
+        amenity_type: amenity_type,
+        bbox: [minLon, minLat, maxLon, maxLat]
+      },
+      processResponse: (osmData) => {
+        const geojson = osmToGeoJSON(osmData);
+        
+        const response = createGeoJSONResponse(geojson, {
+          amenity_type: amenity_type,
+          bbox: [minLon, minLat, maxLon, maxLat]
+        });
+        
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify(response, null, 2)
+          }]
+        };
+      }
     });
-    
-    return {
-      content: [{
-        type: 'text',
-        text: JSON.stringify(response, null, 2)
-      }]
-    };
   } catch (error) {
     return {
       content: [{

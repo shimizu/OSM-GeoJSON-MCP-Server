@@ -3,6 +3,7 @@
 
 import { validateCommonInputs, validateFilter } from '../utils/validator.js';
 import { osmToGeoJSON, createGeoJSONResponse } from '../utils/converter.js';
+import { handleQueryWithOptionalFile } from '../utils/file-handler.js';
 
 export const railwaysToolSchema = {
   name: 'get_railways',
@@ -19,6 +20,10 @@ export const railwaysToolSchema = {
         description: '鉄道タイプフィルター（オプション）',
         enum: ['rail', 'subway', 'tram', 'monorail', 'station', 'platform', 'all'],
         default: 'all'
+      },
+      output_path: {
+        type: 'string',
+        description: '保存先ファイルパス（オプション）。指定するとファイルに保存、指定しないとJSON応答を返す'
       }
     },
     required: ['minLon', 'minLat', 'maxLon', 'maxLat']
@@ -26,7 +31,7 @@ export const railwaysToolSchema = {
 };
 
 export async function getRailways(overpassClient, args) {
-  const { minLon, minLat, maxLon, maxLat, railway_type = 'all' } = args;
+  const { minLon, minLat, maxLon, maxLat, railway_type = 'all', output_path } = args;
   
   // 入力検証
   validateCommonInputs(args);
@@ -89,20 +94,31 @@ out skel qt;`;
   }
   
   try {
-    const osmData = await overpassClient.query(query);
-    const geojson = osmToGeoJSON(osmData);
-    
-    const response = createGeoJSONResponse(geojson, {
-      railway_type: railway_type,
-      bbox: [minLon, minLat, maxLon, maxLat]
+    return await handleQueryWithOptionalFile({
+      overpassClient,
+      query,
+      output_path,
+      dataType: '鉄道',
+      metadata: {
+        railway_type: railway_type,
+        bbox: [minLon, minLat, maxLon, maxLat]
+      },
+      processResponse: (osmData) => {
+        const geojson = osmToGeoJSON(osmData);
+        
+        const response = createGeoJSONResponse(geojson, {
+          railway_type: railway_type,
+          bbox: [minLon, minLat, maxLon, maxLat]
+        });
+        
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify(response, null, 2)
+          }]
+        };
+      }
     });
-    
-    return {
-      content: [{
-        type: 'text',
-        text: JSON.stringify(response, null, 2)
-      }]
-    };
   } catch (error) {
     return {
       content: [{
