@@ -45,7 +45,7 @@ node osm-geojson-mcp.js
 npx @modelcontextprotocol/inspector node osm-geojson-mcp.js
 ```
 
-ブラウザで http://localhost:5173 にアクセスしてツールをテストできます。
+ブラウザでアクセスしてツールをテストできます。
 
 ### Claude Desktopでの使用
 
