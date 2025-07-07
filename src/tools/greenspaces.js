@@ -3,7 +3,8 @@
 
 import { validateCommonInputs, validateFilter } from '../utils/validator.js';
 import { osmToGeoJSON, createGeoJSONResponse } from '../utils/converter.js';
-import { handleQueryWithOptionalFile } from '../utils/file-handler.js';
+import fs from 'fs/promises';
+import osmtogeojson from 'osmtogeojson';
 
 export const greenspacesToolSchema = {
   name: 'get_green_spaces',
@@ -21,6 +22,12 @@ export const greenspacesToolSchema = {
         enum: ['park', 'forest', 'garden', 'farmland', 'grass', 'meadow', 'nature_reserve', 'all'],
         default: 'all'
       },
+      limit: {
+        type: 'number',
+        description: '取得件数の上限（オプション）。1-10000の範囲で指定可能',
+        minimum: 1,
+        maximum: 10000
+      },
       output_path: {
         type: 'string',
         description: '保存先ファイルパス（オプション）。指定するとファイルに保存、指定しないとJSON応答を返す'
@@ -31,10 +38,11 @@ export const greenspacesToolSchema = {
 };
 
 export async function getGreenSpaces(overpassClient, args) {
-  const { minLon, minLat, maxLon, maxLat, green_space_type = 'all', output_path } = args;
+  const { minLon, minLat, maxLon, maxLat, green_space_type = 'all', limit, output_path } = args;
   
-  // 入力検証
-  validateCommonInputs(args);
+  // 入力検証（制限値も含む）
+  const validation = validateCommonInputs(args);
+  const normalizedLimit = validation.normalizedLimit;
   
   // 緑地タイプフィルターの検証
   const allowedGreenSpaceTypes = ['park', 'forest', 'garden', 'farmland', 'grass', 'meadow', 'nature_reserve', 'all'];
@@ -42,6 +50,9 @@ export async function getGreenSpaces(overpassClient, args) {
   if (!filterValidation.isValid) {
     throw new Error(filterValidation.error);
   }
+  
+  // 制限値をクエリに適用
+  const outStatement = normalizedLimit ? `out body ${normalizedLimit};` : 'out body;';
   
   // 緑地データのクエリ構築
   let query;
@@ -56,7 +67,7 @@ export async function getGreenSpaces(overpassClient, args) {
   relation["landuse"~"^(forest|farmland|grass|meadow)$"](${minLat},${minLon},${maxLat},${maxLon});
   relation["natural"~"^(wood|forest|grassland|scrub)$"](${minLat},${minLon},${maxLat},${maxLon});
 );
-out body;
+${outStatement}
 >;
 out skel qt;`;
   } else {
@@ -95,37 +106,75 @@ out skel qt;`;
   ${wayQueries}
   ${relationQueries}
 );
-out body;
+${outStatement}
 >;
 out skel qt;`;
   }
   
   try {
-    return await handleQueryWithOptionalFile({
-      overpassClient,
-      query,
-      output_path,
-      dataType: '緑地',
-      metadata: {
-        green_space_type: green_space_type,
-        bbox: [minLon, minLat, maxLon, maxLat]
-      },
-      processResponse: (osmData) => {
-        const geojson = osmToGeoJSON(osmData);
-        
-        const response = createGeoJSONResponse(geojson, {
-          green_space_type: green_space_type,
-          bbox: [minLon, minLat, maxLon, maxLat]
-        });
+    // ファイル出力が指定されている場合
+    if (output_path) {
+      const result = await overpassClient.queryToFile(query, output_path);
+      
+      // OSMデータをGeoJSONに変換する場合
+      if (output_path.endsWith('.geojson')) {
+        const osmData = JSON.parse(await fs.readFile(output_path, 'utf8'));
+        const geojson = osmtogeojson(osmData);
+        await fs.writeFile(output_path, JSON.stringify(geojson, null, 2));
         
         return {
           content: [{
             type: 'text',
-            text: JSON.stringify(response, null, 2)
+            text: JSON.stringify({
+              status: 'success',
+              message: '緑地データをダウンロードしました',
+              file: output_path,
+              size: result.size,
+              feature_count: geojson.features.length,
+              limit_applied: normalizedLimit,
+              is_truncated: normalizedLimit ? geojson.features.length >= normalizedLimit : false,
+              green_space_type: green_space_type,
+              bbox: [minLon, minLat, maxLon, maxLat],
+              server: result.server
+            }, null, 2)
           }]
         };
       }
+      
+      // OSM形式のまま保存
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            status: 'success',
+            message: '緑地データをダウンロードしました（OSM形式）',
+            file: output_path,
+            size: result.size,
+            green_space_type: green_space_type,
+            bbox: [minLon, minLat, maxLon, maxLat],
+            server: result.server
+          }, null, 2)
+        }]
+      };
+    }
+    
+    // 従来の動作：JSONレスポンスを返す
+    const osmData = await overpassClient.query(query, false, 'get_green_spaces');
+    const geojson = osmToGeoJSON(osmData);
+    
+    const response = createGeoJSONResponse(geojson, {
+      green_space_type: green_space_type,
+      limit_applied: normalizedLimit,
+      is_truncated: normalizedLimit ? geojson.features.length >= normalizedLimit : false,
+      bbox: [minLon, minLat, maxLon, maxLat]
     });
+    
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify(response, null, 2)
+      }]
+    };
   } catch (error) {
     return {
       content: [{

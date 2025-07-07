@@ -15,7 +15,8 @@
     "test:diagnostic": "node test/network-diagnostic.js",
     "test:features": "node test/test-new-features.js",
     "test:download": "node test/test-download.js",
-    "test:direct": "node test/test-direct-download.js"
+    "test:direct": "node test/test-direct-download.js",
+    "test:limit": "node test/test-limit-functionality.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.6.0",

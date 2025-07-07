@@ -22,6 +22,12 @@ export const buildingsToolSchema = {
         enum: ['residential', 'commercial', 'industrial', 'public', 'all'],
         default: 'all'
       },
+      limit: {
+        type: 'number',
+        description: '取得件数の上限（オプション）。1-10000の範囲で指定可能',
+        minimum: 1,
+        maximum: 10000
+      },
       output_path: {
         type: 'string',
         description: '保存先ファイルパス（オプション）。指定するとファイルに保存、指定しないとJSON応答を返す'
@@ -32,10 +38,11 @@ export const buildingsToolSchema = {
 };
 
 export async function getBuildings(overpassClient, args) {
-  const { minLon, minLat, maxLon, maxLat, building_type = 'all', output_path } = args;
+  const { minLon, minLat, maxLon, maxLat, building_type = 'all', limit, output_path } = args;
   
-  // 入力検証
-  validateCommonInputs(args);
+  // 入力検証（制限値も含む）
+  const validation = validateCommonInputs(args);
+  const normalizedLimit = validation.normalizedLimit;
   
   // 建物タイプフィルターの検証
   const allowedBuildingTypes = ['residential', 'commercial', 'industrial', 'public', 'all'];
@@ -47,12 +54,15 @@ export async function getBuildings(overpassClient, args) {
   // 建物タイプのフィルター設定
   let buildingFilter = building_type !== 'all' ? `["building"="${building_type}"]` : '["building"]';
   
-  // Overpass QLクエリの構築（メモリ制限と最適化を追加）
+  // 制限値をクエリに適用
+  const outStatement = normalizedLimit ? `out body ${normalizedLimit};` : 'out body;';
+  
+  // Overpass QLクエリの構築（制限値と最適化を追加）
   const query = `[out:json][timeout:180][maxsize:1073741824];
 (
   way${buildingFilter}(${minLat},${minLon},${maxLat},${maxLon});
 );
-out body;
+${outStatement}
 >;
 out skel qt;`;
   
@@ -76,6 +86,8 @@ out skel qt;`;
               file: output_path,
               size: result.size,
               feature_count: geojson.features.length,
+              limit_applied: normalizedLimit,
+              is_truncated: normalizedLimit ? geojson.features.length >= normalizedLimit : false,
               building_type: building_type,
               bbox: [minLon, minLat, maxLon, maxLat],
               server: result.server
@@ -107,6 +119,8 @@ out skel qt;`;
     
     const response = createGeoJSONResponse(geojson, {
       building_type: building_type,
+      limit_applied: normalizedLimit,
+      is_truncated: normalizedLimit ? geojson.features.length >= normalizedLimit : false,
       bbox: [minLon, minLat, maxLon, maxLat]
     });
     

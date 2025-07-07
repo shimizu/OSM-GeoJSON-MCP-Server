@@ -25,6 +25,12 @@ export const roadsToolSchema = {
         description: '道路タイプフィルター（複数選択可）',
         default: ['all']
       },
+      limit: {
+        type: 'number',
+        description: '取得件数の上限（オプション）。1-10000の範囲で指定可能',
+        minimum: 1,
+        maximum: 10000
+      },
       output_path: {
         type: 'string',
         description: '保存先ファイルパス（オプション）。指定するとファイルに保存、指定しないとJSON応答を返す'
@@ -35,10 +41,11 @@ export const roadsToolSchema = {
 };
 
 export async function getRoads(overpassClient, args) {
-  const { minLon, minLat, maxLon, maxLat, road_types = ['all'], output_path } = args;
+  const { minLon, minLat, maxLon, maxLat, road_types = ['all'], limit, output_path } = args;
   
-  // 入力検証
-  validateCommonInputs(args);
+  // 入力検証（制限値も含む）
+  const validation = validateCommonInputs(args);
+  const normalizedLimit = validation.normalizedLimit;
   
   // 道路タイプフィルターの検証
   const allowedRoadTypes = ['motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'residential', 'all'];
@@ -58,11 +65,14 @@ export async function getRoads(overpassClient, args) {
     roadFilter = '["highway"]';
   }
   
+  // 制限値をクエリに適用
+  const outStatement = normalizedLimit ? `out body ${normalizedLimit};` : 'out body;';
+  
   const query = `[out:json][timeout:180][maxsize:1073741824];
 (
   way${roadFilter}(${minLat},${minLon},${maxLat},${maxLon});
 );
-out body;
+${outStatement}
 >;
 out skel qt;`;
   

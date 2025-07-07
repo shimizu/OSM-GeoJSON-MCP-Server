@@ -44,6 +44,13 @@ const tests = [
     script: 'test-direct-download.js',
     timeout: 45000,
     critical: false
+  },
+  {
+    name: 'Limit Functionality Test',
+    description: 'Test limit parameter functionality across all tools',
+    script: 'test-limit-functionality.js',
+    timeout: 45000,
+    critical: true
   }
 ];
 

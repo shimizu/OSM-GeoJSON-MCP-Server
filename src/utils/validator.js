@@ -83,9 +83,49 @@ export function validateFilter(value, allowedValues) {
   };
 }
 
+// 制限値の検証
+export function validateLimit(limit) {
+  if (limit === null || limit === undefined) {
+    return { isValid: true, normalizedLimit: null };
+  }
+
+  if (typeof limit !== 'number' || !Number.isInteger(limit)) {
+    return { 
+      isValid: false, 
+      error: '制限値は整数である必要があります' 
+    };
+  }
+
+  if (limit < 1) {
+    return { 
+      isValid: false, 
+      error: '制限値は1以上である必要があります' 
+    };
+  }
+
+  if (limit > 10000) {
+    return { 
+      isValid: false, 
+      error: '制限値は10000以下である必要があります（サーバー負荷を考慮）' 
+    };
+  }
+
+  // 推奨値の範囲をチェック
+  const warnings = [];
+  if (limit > 1000) {
+    warnings.push('1000件を超える取得は時間がかかる可能性があります');
+  }
+
+  return { 
+    isValid: true, 
+    normalizedLimit: limit,
+    warnings 
+  };
+}
+
 // 一般的な入力検証
 export function validateCommonInputs(args) {
-  const { minLon, minLat, maxLon, maxLat } = args;
+  const { minLon, minLat, maxLon, maxLat, limit } = args;
   
   // 境界ボックスの検証
   const bboxErrors = validateBoundingBox(minLon, minLat, maxLon, maxLat);
@@ -96,10 +136,27 @@ export function validateCommonInputs(args) {
   // エリアサイズの検証
   const { area, warnings } = validateAreaSize(minLon, minLat, maxLon, maxLat);
   
+  // 制限値の検証
+  const limitValidation = validateLimit(limit);
+  if (!limitValidation.isValid) {
+    throw new Error(limitValidation.error);
+  }
+  
   // 警告をコンソールに出力
   warnings.forEach(warning => {
     console.error(`Warning: ${warning}`);
   });
   
-  return { area, warnings };
+  // 制限値の警告も出力
+  if (limitValidation.warnings) {
+    limitValidation.warnings.forEach(warning => {
+      console.error(`Warning: ${warning}`);
+    });
+  }
+  
+  return { 
+    area, 
+    warnings,
+    normalizedLimit: limitValidation.normalizedLimit
+  };
 }
