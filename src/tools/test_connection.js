@@ -14,17 +14,37 @@ export async function testConnection(overpassClient) {
   try {
     const results = await overpassClient.testConnection();
     
+    const response = {
+      type: 'connection_test',
+      results: results,
+      summary: {
+        total_servers: results.length,
+        successful_connections: results.filter(r => r.includes('✓')).length,
+        failed_connections: results.filter(r => r.includes('✗')).length
+      }
+    };
+    
     return {
       content: [{
         type: 'text',
-        text: results.join('\n')
+        text: JSON.stringify(response, null, 2)
       }]
     };
   } catch (error) {
+    const response = {
+      type: 'connection_test',
+      error: error.message,
+      summary: {
+        total_servers: 0,
+        successful_connections: 0,
+        failed_connections: 0
+      }
+    };
+    
     return {
       content: [{
         type: 'text',
-        text: `Connection test failed: ${error.message}`
+        text: JSON.stringify(response, null, 2)
       }]
     };
   }
