@@ -412,28 +412,8 @@ OSMファイルをGeoJSONに変換します。
 - **メタデータ**: レスポンスに `limit_applied` と `is_truncated` を含む
 - **パフォーマンス**: 制限により高速化とメモリ効率化を実現
 
-## 🎛️ Claude Desktop / Claude Code 設定
+## 🎛️  Claude Code 設定
 
-### Claude Desktop の設定
-
-1. 設定ファイルを開く：
-   - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-   - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
-
-2. 以下を追加：
-
-```json
-{
-  "mcpServers": {
-    "osm-geojson": {
-      "command": "node",
-      "args": ["/absolute/path/to/osm-geojson-mcp-server/src/index.js"]
-    }
-  }
-}
-```
-
-3. Claude Desktop を再起動
 
 ### Claude Code での使用
 
