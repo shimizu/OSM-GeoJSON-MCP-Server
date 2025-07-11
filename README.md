@@ -423,6 +423,9 @@ Claude Code では `claude mcp add` コマンドでMCPサーバーを登録し�
 # プロジェクトに移動
 cd /path/to/osm-geojson-mcp-server
 
+# 実行権限を付与（初回のみ必要）
+chmod +x src/index.js
+
 # MCPサーバーを登録（ローカルスコープ）
 claude mcp add osm-geojson node src/index.js
 
