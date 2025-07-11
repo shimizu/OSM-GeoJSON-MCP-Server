@@ -442,7 +442,11 @@ claude mcp add osm-geojson /absolute/path/to/osm-geojson-mcp-server/src/index.js
 
 ### 使用開始
 
-設定完了後、Claude で以下のように話しかけてください：
+claudeを起動後`/mcp`コマンドを実行しMCPが正しく接続できているか確認してください。
+
+`✔ connected`が表示されていれば正常に動作しています。
+
+Claude に以下のように話しかけてください：
 
 ```
 「東京駅周辺の建物データを取得して」
