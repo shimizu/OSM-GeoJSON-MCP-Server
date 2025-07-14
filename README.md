@@ -430,7 +430,7 @@ chmod +x src/index.js
 claude mcp add osm-geojson node src/index.js
 
 # または絶対パスで登録
-claude mcp add osm-geojson /absolute/path/to/osm-geojson-mcp-server/src/index.js
+claude mcp add osm-geojson [absolute path to ]/osm-geojson-mcp-server/src/index.js
 ```
 
 詳細は [Claude Code MCP ドキュメント](https://docs.anthropic.com/ja/docs/claude-code/mcp) を参照してください。
