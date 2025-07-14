@@ -433,11 +433,6 @@ claude mcp add osm-geojson node src/index.js
 claude mcp add osm-geojson /absolute/path/to/osm-geojson-mcp-server/src/index.js
 ```
 
-**スコープオプション:**
-- `--local` (デフォルト): 現在のプロジェクトのみ
-- `--project`: チーム共有（.mcp.jsonに保存）
-- `--user`: 複数プロジェクト間で使用
-
 詳細は [Claude Code MCP ドキュメント](https://docs.anthropic.com/ja/docs/claude-code/mcp) を参照してください。
 
 ### 使用開始
