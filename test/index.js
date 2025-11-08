@@ -97,7 +97,6 @@ async function runTest(test, verboseMode = false) {
       stdio: 'inherit',
       cwd: path.dirname(__dirname) // プロジェクトルートディレクトリ
     });
-    testProcess.unref();
     
     let completed = false;
     

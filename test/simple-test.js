@@ -2,9 +2,15 @@
 // 最も簡単な接続テスト
 
 import axios from 'axios';
+import https from 'https';
 
 async function testMinimalQuery() {
   console.log('Testing minimal Overpass query...\n');
+
+  // SSL証明書検証を無効化（IPアドレス直接接続用）
+  const httpsAgent = new https.Agent({
+    rejectUnauthorized: false
+  });
 
   // 最小限のクエリ（Wikiの例に基づく）
   const minimalQuery = '[out:json];out count;';
@@ -16,16 +22,18 @@ async function testMinimalQuery() {
   ];
 
   for (const server of servers) {
-    console.log(`\nTesting ${server}...`);
+    console.log(`\nTesting ${server.url} (Host: ${server.host})...`);
     
     try {
       console.time('Request time');
       
-      const response = await axios.post(server, minimalQuery, {
+      const response = await axios.post(server.url, minimalQuery, {
         headers: {
           'Content-Type': 'text/plain',
-          'User-Agent': 'OSM-Test/1.0'
+          'User-Agent': 'OSM-MCP/1.0',
+          'Host': server.host
         },
+        httpsAgent: httpsAgent,
         timeout: 30000,
         validateStatus: (status) => true // すべてのステータスを受け入れる
       });
@@ -34,9 +42,9 @@ async function testMinimalQuery() {
       console.log(`Status: ${response.status}`);
       
       if (response.status === 200) {
-        console.log(`✓ SUCCESS! Response:`, JSON.stringify(response.data, null, 2));
+        console.log(`✓ SUCCESS for ${server.host}! Response:`, JSON.stringify(response.data, null, 2));
       } else {
-        console.log(`✗ Error status: ${response.status}`);
+        console.log(`✗ Error status for ${server.host}: ${response.status}`);
         console.log(`Response:`, response.data);
       }
       
@@ -64,14 +72,22 @@ async function testDNS() {
   
   const hosts = [
     'overpass-api.de',
-    'lz4.overpass-api.de',
-    'overpass.kumi.systems'
+    'lz4.overpass-api.de', 
+    'overpass.kumi.systems',
+    '162.55.144.139',
+    '65.109.112.52',
+    '193.219.97.30'
   ];
   
   for (const host of hosts) {
     try {
-      const addresses = await dns.resolve4(host);
-      console.log(`✓ ${host} resolves to:`, addresses);
+      // IPアドレスの場合はDNS解決をスキップ
+      if (host.match(/^\d+\.\d+\.\d+\.\d+$/)) {
+        console.log(`✓ ${host} is direct IP address`);
+      } else {
+        const addresses = await dns.resolve4(host);
+        console.log(`✓ ${host} resolves to:`, addresses);
+      }
     } catch (error) {
       console.log(`✗ ${host} DNS error:`, error.message);
     }
