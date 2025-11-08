@@ -3,7 +3,7 @@
 
 import { validateCommonInputs, validateFilter } from '../utils/validator.js';
 import { osmToGeoJSON, createGeoJSONResponse } from '../utils/converter.js';
-import fs from 'fs/promises';
+import { executeGeoJSONQuery } from './download.js';
 import osmtogeojson from 'osmtogeojson';
 
 export const railwaysToolSchema = {
@@ -56,9 +56,10 @@ export async function getRailways(overpassClient, args) {
   
   // 鉄道データのクエリ構築
   let query;
+  const querySettings = `[timeout:180][maxsize:1073741824];`;
   
   if (railway_type === 'all') {
-    query = `[out:json][timeout:180][maxsize:1073741824];
+    query = `${querySettings}
 (
   way["railway"](${minLat},${minLon},${maxLat},${maxLon});
   node["railway"](${minLat},${minLon},${maxLat},${maxLon});
@@ -69,7 +70,7 @@ ${outStatement}
 out skel qt;`;
   } else if (railway_type === 'station') {
     // 駅は主にノードとして表現される
-    query = `[out:json][timeout:180][maxsize:1073741824];
+    query = `${querySettings}
 (
   node["railway"="station"](${minLat},${minLon},${maxLat},${maxLon});
   node["public_transport"="station"](${minLat},${minLon},${maxLat},${maxLon});
@@ -81,7 +82,7 @@ out skel qt;`;
 ${outStatement}`;
   } else if (railway_type === 'platform') {
     // プラットフォーム
-    query = `[out:json][timeout:180][maxsize:1073741824];
+    query = `${querySettings}
 (
   way["railway"="platform"](${minLat},${minLon},${maxLat},${maxLon});
   way["public_transport"="platform"](${minLat},${minLon},${maxLat},${maxLon});
@@ -94,7 +95,7 @@ ${outStatement}
 out skel qt;`;
   } else {
     // 特定の線路タイプ（rail, subway, tram, monorail）
-    query = `[out:json][timeout:180][maxsize:1073741824];
+    query = `${querySettings}
 (
   way["railway"="${railway_type}"](${minLat},${minLon},${maxLat},${maxLon});
   relation["railway"="${railway_type}"](${minLat},${minLon},${maxLat},${maxLon});
@@ -107,42 +108,23 @@ out skel qt;`;
   try {
     // ファイル出力が指定されている場合
     if (output_path) {
-      const result = await overpassClient.queryToFile(query, output_path);
-      
-      // OSMデータをGeoJSONに変換する場合
-      if (output_path.endsWith('.geojson')) {
-        const osmData = JSON.parse(await fs.readFile(output_path, 'utf8'));
-        const geojson = osmtogeojson(osmData);
-        await fs.writeFile(output_path, JSON.stringify(geojson, null, 2));
-        
-        return {
-          content: [{
-            type: 'text',
-            text: JSON.stringify({
-              status: 'success',
-              message: '鉄道データをダウンロードしました',
-              file: output_path,
-              size: result.size,
-              feature_count: geojson.features.length,
-              limit_applied: normalizedLimit,
-              is_truncated: normalizedLimit ? geojson.features.length >= normalizedLimit : false,
-              railway_type: railway_type,
-              bbox: [minLon, minLat, maxLon, maxLat],
-              server: result.server
-            }, null, 2)
-          }]
-        };
+      if (!output_path.endsWith('.geojson')) {
+        throw new Error('ファイル出力は .geojson 形式のみサポートしています。');
       }
       
-      // OSM形式のまま保存
+      const result = await executeGeoJSONQuery(overpassClient, query, output_path);
+      
       return {
         content: [{
           type: 'text',
           text: JSON.stringify({
             status: 'success',
-            message: '鉄道データをダウンロードしました（OSM形式）',
+            message: '鉄道データをダウンロードしました',
             file: output_path,
             size: result.size,
+            feature_count: result.feature_count,
+            limit_applied: normalizedLimit,
+            is_truncated: normalizedLimit ? result.feature_count >= normalizedLimit : false,
             railway_type: railway_type,
             bbox: [minLon, minLat, maxLon, maxLat],
             server: result.server
@@ -152,7 +134,7 @@ out skel qt;`;
     }
     
     // 従来の動作：JSONレスポンスを返す
-    const osmData = await overpassClient.query(query, false, 'get_railways');
+    const osmData = await overpassClient.query(`[out:json]${query}`, false, 'get_railways');
     const geojson = osmToGeoJSON(osmData);
     
     const response = createGeoJSONResponse(geojson, {

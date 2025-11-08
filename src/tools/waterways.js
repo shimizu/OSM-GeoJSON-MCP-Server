@@ -3,7 +3,7 @@
 
 import { validateCommonInputs, validateFilter } from '../utils/validator.js';
 import { osmToGeoJSON, createGeoJSONResponse } from '../utils/converter.js';
-import fs from 'fs/promises';
+import { executeGeoJSONQuery } from './download.js';
 import osmtogeojson from 'osmtogeojson';
 
 export const waterwaysToolSchema = {
@@ -58,9 +58,10 @@ export async function getWaterways(overpassClient, args) {
   // waterway: 河川、運河など（線形）
   // natural=water: 湖、池など（面）
   let query;
+  const querySettings = `[timeout:180][maxsize:1073741824];`;
   
   if (waterway_type === 'all') {
-    query = `[out:json][timeout:180][maxsize:1073741824];
+    query = `${querySettings}
 (
   way["waterway"](${minLat},${minLon},${maxLat},${maxLon});
   way["natural"="water"](${minLat},${minLon},${maxLat},${maxLon});
@@ -72,7 +73,7 @@ ${outStatement}
 out skel qt;`;
   } else if (['lake', 'reservoir', 'pond'].includes(waterway_type)) {
     // 湖、貯水池、池は natural=water で検索
-    query = `[out:json][timeout:180][maxsize:1073741824];
+    query = `${querySettings}
 (
   way["natural"="water"]["water"="${waterway_type}"](${minLat},${minLon},${maxLat},${maxLon});
   way["natural"="water"][!"water"](${minLat},${minLon},${maxLat},${maxLon});
@@ -83,7 +84,7 @@ ${outStatement}
 out skel qt;`;
   } else {
     // 河川、運河など
-    query = `[out:json][timeout:180][maxsize:1073741824];
+    query = `${querySettings}
 (
   way["waterway"="${waterway_type}"](${minLat},${minLon},${maxLat},${maxLon});
   relation["waterway"="${waterway_type}"](${minLat},${minLon},${maxLat},${maxLon});
@@ -96,42 +97,23 @@ out skel qt;`;
   try {
     // ファイル出力が指定されている場合
     if (output_path) {
-      const result = await overpassClient.queryToFile(query, output_path);
-      
-      // OSMデータをGeoJSONに変換する場合
-      if (output_path.endsWith('.geojson')) {
-        const osmData = JSON.parse(await fs.readFile(output_path, 'utf8'));
-        const geojson = osmtogeojson(osmData);
-        await fs.writeFile(output_path, JSON.stringify(geojson, null, 2));
-        
-        return {
-          content: [{
-            type: 'text',
-            text: JSON.stringify({
-              status: 'success',
-              message: '水域データをダウンロードしました',
-              file: output_path,
-              size: result.size,
-              feature_count: geojson.features.length,
-              limit_applied: normalizedLimit,
-              is_truncated: normalizedLimit ? geojson.features.length >= normalizedLimit : false,
-              waterway_type: waterway_type,
-              bbox: [minLon, minLat, maxLon, maxLat],
-              server: result.server
-            }, null, 2)
-          }]
-        };
+      if (!output_path.endsWith('.geojson')) {
+        throw new Error('ファイル出力は .geojson 形式のみサポートしています。');
       }
       
-      // OSM形式のまま保存
+      const result = await executeGeoJSONQuery(overpassClient, query, output_path);
+      
       return {
         content: [{
           type: 'text',
           text: JSON.stringify({
             status: 'success',
-            message: '水域データをダウンロードしました（OSM形式）',
+            message: '水域データをダウンロードしました',
             file: output_path,
             size: result.size,
+            feature_count: result.feature_count,
+            limit_applied: normalizedLimit,
+            is_truncated: normalizedLimit ? result.feature_count >= normalizedLimit : false,
             waterway_type: waterway_type,
             bbox: [minLon, minLat, maxLon, maxLat],
             server: result.server
@@ -141,7 +123,7 @@ out skel qt;`;
     }
     
     // 従来の動作：JSONレスポンスを返す
-    const osmData = await overpassClient.query(query, false, 'get_waterways');
+    const osmData = await overpassClient.query(`[out:json]${query}`, false, 'get_waterways');
     const geojson = osmToGeoJSON(osmData);
     
     const response = createGeoJSONResponse(geojson, {

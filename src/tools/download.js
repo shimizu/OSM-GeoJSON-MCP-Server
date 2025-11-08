@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { createWriteStream } from 'fs';
 import https from 'https';
+import osmtogeojson from 'osmtogeojson';
 
 export const downloadOSMDataSchema = {
   name: 'download_osm_data',
@@ -97,7 +98,7 @@ async function downloadToFile(url, query, outputPath, headers = {}) {
 
         res.on('data', (chunk) => {
           downloadedBytes += chunk.length;
-          if (downloadedBytes % (1024 * 1024) === 0) {
+          if (downloadedBytes > 0 && downloadedBytes % (1024 * 1024) === 0) {
             console.error(`Downloaded: ${(downloadedBytes / 1024 / 1024).toFixed(1)} MB`);
           }
         });
@@ -123,6 +124,53 @@ async function downloadToFile(url, query, outputPath, headers = {}) {
     req.write(query);
     req.end();
   });
+}
+
+export async function executeGeoJSONQuery(overpassClient, query, outputPath) {
+  const servers = overpassClient.servers;
+  let lastError = null;
+
+  const tempPath = outputPath + '.tmp.osm.json';
+
+  for (const server of servers) {
+    try {
+      // 1. Download raw data to a temp file
+      const fullQuery = query.startsWith('[out:json]') ? query : `[out:json]${query}`;
+      await downloadToFile(
+        server.url,
+        fullQuery,
+        tempPath,
+        { 'Host': server.host }
+      );
+
+      // 2. Read temp file and convert
+      const osmData = JSON.parse(await fs.readFile(tempPath, 'utf8'));
+      const geojson = osmtogeojson(osmData);
+
+      // 3. Write final GeoJSON file
+      await fs.writeFile(outputPath, JSON.stringify(geojson, null, 2));
+
+      // 4. Clean up temp file
+      await fs.unlink(tempPath);
+
+      // 5. Return stats
+      const stats = await fs.stat(outputPath);
+      return {
+        success: true,
+        size: stats.size,
+        feature_count: geojson.features.length,
+        server: server.host
+      };
+
+    } catch (error) {
+      lastError = error;
+      console.error(`Failed with ${server.host}: ${error.message}`);
+      // Clean up temp file on failure too
+      try { await fs.unlink(tempPath); } catch (e) { /* ignore */ }
+    }
+  }
+
+  throw new Error(`All servers failed to process GeoJSON query: ${lastError?.message}`);
 }
 
 export async function downloadOSMData(overpassClient, args) {
