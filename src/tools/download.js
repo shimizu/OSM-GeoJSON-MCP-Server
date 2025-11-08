@@ -16,7 +16,7 @@ export const downloadOSMDataSchema = {
       },
       output_path: {
         type: 'string',
-        description: '保存先ファイルパス（例: ./data/tokyo_buildings.json）'
+        description: '保存先ファイルパス（例: ./data/tokyo_buildings.geojson）'
       },
       format: {
         type: 'string',
@@ -67,6 +67,7 @@ export const downloadAreaAllSchema = {
   }
 };
 
+// ファイルにダウンロードする共通関数
 async function downloadToFile(url, query, outputPath, headers = {}) {
   return new Promise((resolve, reject) => {
     const urlObj = new URL(url);
@@ -98,6 +99,7 @@ async function downloadToFile(url, query, outputPath, headers = {}) {
 
         res.on('data', (chunk) => {
           downloadedBytes += chunk.length;
+          // 1MBごとに進行状況を出力
           if (downloadedBytes > 0 && downloadedBytes % (1024 * 1024) === 0) {
             console.error(`Downloaded: ${(downloadedBytes / 1024 / 1024).toFixed(1)} MB`);
           }
@@ -126,6 +128,7 @@ async function downloadToFile(url, query, outputPath, headers = {}) {
   });
 }
 
+// GeoJSONクエリを実行してファイル出力する関数
 export async function executeGeoJSONQuery(overpassClient, query, outputPath) {
   const servers = overpassClient.servers;
   let lastError = null;
@@ -134,7 +137,7 @@ export async function executeGeoJSONQuery(overpassClient, query, outputPath) {
 
   for (const server of servers) {
     try {
-      // 1. Download raw data to a temp file
+      // 1. 生データを一時ファイルにダウンロード
       const fullQuery = query.startsWith('[out:json]') ? query : `[out:json]${query}`;
       await downloadToFile(
         server.url,
@@ -143,17 +146,17 @@ export async function executeGeoJSONQuery(overpassClient, query, outputPath) {
         { 'Host': server.host }
       );
 
-      // 2. Read temp file and convert
+      // 2. 一時ファイルを読み込んで変換
       const osmData = JSON.parse(await fs.readFile(tempPath, 'utf8'));
       const geojson = osmtogeojson(osmData);
 
-      // 3. Write final GeoJSON file
+      // 3. 最終的なGeoJSONファイルを書き込み
       await fs.writeFile(outputPath, JSON.stringify(geojson, null, 2));
 
-      // 4. Clean up temp file
+      // 4. 一時ファイルをクリーンアップ
       await fs.unlink(tempPath);
 
-      // 5. Return stats
+      // 5. 統計情報を返す
       const stats = await fs.stat(outputPath);
       return {
         success: true,
@@ -165,7 +168,7 @@ export async function executeGeoJSONQuery(overpassClient, query, outputPath) {
     } catch (error) {
       lastError = error;
       console.error(`Failed with ${server.host}: ${error.message}`);
-      // Clean up temp file on failure too
+      // 失敗時も一時ファイルをクリーンアップ
       try { await fs.unlink(tempPath); } catch (e) { /* ignore */ }
     }
   }
