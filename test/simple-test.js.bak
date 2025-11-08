@@ -10,9 +10,11 @@ async function testMinimalQuery() {
   const minimalQuery = '[out:json];out count;';
   
   const servers = [
-    { url: 'https://162.55.144.139/api/interpreter', host: 'overpass-api.de' },
-    { url: 'https://65.109.112.52/api/interpreter', host: 'lz4.overpass-api.de' },
-    { url: 'https://193.219.97.30/api/interpreter', host: 'overpass.kumi.systems' }
+    'https://overpass-api.de/api/interpreter',
+    'https://lz4.overpass-api.de/api/interpreter',
+    'https://z.overpass-api.de/api/interpreter',
+    'https://overpass.kumi.systems/api/interpreter',
+    'https://overpass.osm.ch/api/interpreter'
   ];
 
   for (const server of servers) {

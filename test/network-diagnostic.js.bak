@@ -46,9 +46,7 @@ async function testHTTPSRequest(url) {
       method: 'GET',
       timeout: 10000,
       headers: {
-        'Host': 'overpass-api.de',
         'User-Agent': 'OSM-Diagnostic/1.0'
-        'Host': parsedUrl.hostname.match(/^\d+\.\d+\.\d+\.\d+$/) ? 'overpass-api.de' : parsedUrl.hostname,
       }
     };
     
@@ -152,7 +150,7 @@ async function simpleTraceroute(host) {
 async function curlEquivalent() {
   console.log('\n=== Testing with minimal HTTP client ===\n');
   
-  const testUrl = 'https://162.55.144.139/api/interpreter';
+  const testUrl = 'https://overpass-api.de/api/interpreter';
   const minimalQuery = '[out:json];out count;';
   
   return new Promise((resolve) => {
@@ -164,11 +162,9 @@ async function curlEquivalent() {
       path: parsedUrl.pathname,
       method: 'POST',
       headers: {
-        'Host': 'overpass-api.de',
         'Content-Type': 'text/plain',
         'Content-Length': Buffer.byteLength(minimalQuery),
         'User-Agent': 'curl/7.64.1'
-        'Host': parsedUrl.hostname.match(/^\d+\.\d+\.\d+\.\d+$/) ? 'overpass-api.de' : parsedUrl.hostname,
       },
       timeout: 30000,
       rejectUnauthorized: false // 証明書エラーを無視（デバッグ用）
@@ -222,7 +218,7 @@ async function runDiagnostics() {
   showSystemInfo();
   await testOtherServices();
   await testPort443();
-  await simpleTraceroute('162.55.144.139');
+  await simpleTraceroute('overpass-api.de');
   await curlEquivalent();
 }
 
