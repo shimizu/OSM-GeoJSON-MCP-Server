@@ -430,19 +430,18 @@ chmod +x src/index.js
 claude mcp add osm-geojson node src/index.js
 
 # または絶対パスで登録
-claude mcp add osm-geojson /absolute/path/to/osm-geojson-mcp-server/src/index.js
+claude mcp add osm-geojson [absolute path to ]/osm-geojson-mcp-server/src/index.js
 ```
-
-**スコープオプション:**
-- `--local` (デフォルト): 現在のプロジェクトのみ
-- `--project`: チーム共有（.mcp.jsonに保存）
-- `--user`: 複数プロジェクト間で使用
 
 詳細は [Claude Code MCP ドキュメント](https://docs.anthropic.com/ja/docs/claude-code/mcp) を参照してください。
 
 ### 使用開始
 
-設定完了後、Claude で以下のように話しかけてください：
+claudeを起動後`/mcp`コマンドを実行しMCPが正しく接続できているか確認してください。
+
+`✔ connected`が表示されていれば正常に動作しています。
+
+Claude に以下のように話しかけてください：
 
 ```
 「東京駅周辺の建物データを取得して」
