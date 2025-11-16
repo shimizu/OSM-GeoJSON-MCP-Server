@@ -25,24 +25,6 @@ export const downloadOSMDataSchema = {
   }
 };
 
-export const downloadAreaBuildingsSchema = {
-  name: 'download_area_buildings',
-  description: '指定エリアの建物データをダウンロード（簡易版）',
-  inputSchema: {
-    type: 'object',
-    properties: {
-      minLon: { type: 'number', description: '最小経度（西端）' },
-      minLat: { type: 'number', description: '最小緯度（南端）' },
-      maxLon: { type: 'number', description: '最大経度（東端）' },
-      maxLat: { type: 'number', description: '最大緯度（北端）' },
-      output_path: {
-        type: 'string',
-        description: '保存先ファイルパス'
-      }
-    },
-    required: ['minLon', 'minLat', 'maxLon', 'maxLat', 'output_path']
-  }
-};
 
 export const downloadAreaAllSchema = {
   name: 'download_area_all',
@@ -106,20 +88,6 @@ export async function downloadOSMData(overpassClient, args) {
   throw new Error(`All servers failed: ${lastError?.message}`);
 }
 
-export async function downloadAreaBuildings(overpassClient, args) {
-  const { minLon, minLat, maxLon, maxLat, output_path } = args;
-  
-  const query = `[out:json][timeout:180];
-(
-  way["building"](${minLat},${minLon},${maxLat},${maxLon});
-  relation["building"](${minLat},${minLon},${maxLat},${maxLon});
-);
-out body;
->;
-out skel qt;`;
-  
-  return await downloadOSMData(overpassClient, { query, output_path, format: 'json' });
-}
 
 export async function downloadAreaAll(overpassClient, args) {
   const { minLon, minLat, maxLon, maxLat, output_path } = args;

@@ -101,7 +101,6 @@ src/
   - `get_api_stats`: API使用統計・キャッシュ状況
   - `convert_to_geojson`: OSMファイル→GeoJSON変換
   - `download_osm_data`: Overpass QLクエリで生データダウンロード
-  - `download_area_buildings`: エリア指定で建物データダウンロード
   - `download_area_all`: エリア指定で全データダウンロード
 - すべてのツールはMCP応答形式でラップされたGeoJSONを返す
 - ファイル出力オプションも全ツールで利用可能
@@ -297,7 +296,6 @@ out skel qt;`;
 
 ### ダウンロードツール
 - `download_osm_data`: Overpass QLクエリで生データダウンロード
-- `download_area_buildings`: エリア指定で建物データダウンロード
 - `download_area_all`: エリア指定で全データダウンロード
 
 ## トラブルシューティング

@@ -287,12 +287,6 @@ OSMファイルをGeoJSONに変換します。
 - `output_path`: 保存先ファイルパス（必須）
 - `format` (オプション): 出力形式 (`json`, `xml`)
 
-### 🏗️ download_area_buildings  
-指定エリアの建物データをダウンロードします。
-
-**パラメータ:**
-- `minLon`, `minLat`, `maxLon`, `maxLat`: 取得範囲の座標（必須）
-- `output_path`: 保存先ファイルパス（必須）
 
 ### 🌐 download_area_all
 指定エリアの全データをダウンロードします。
