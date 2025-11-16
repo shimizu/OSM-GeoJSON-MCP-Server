@@ -37,24 +37,44 @@ return {
 ```javascript
 // src/tools/download.js の実装例
 export async function downloadOSMData(overpassClient, args) {
-  const { query, output_path } = args;
+  const { query, output_path, format = 'json' } = args;
   
-  // APIからデータを取得し、ファイルにストリーミング保存
-  const result = await downloadToFile(server.url, fullQuery, output_path);
+  const fullQuery = format === 'json' ? 
+    (query.startsWith('[out:json]') ? query : `[out:json];${query}`) :
+    (query.startsWith('[out:xml]') ? query : `[out:xml];${query}`);
   
-  // LLMにはメタデータのみを返す
-  return {
-    content: [{
-      type: 'text',
-      text: JSON.stringify({
-        status: 'success',
-        message: 'データをダウンロードしました',
-        file: output_path,           // ファイルパス
-        size: result.size,           // ファイルサイズ
-        server: server.host          // 使用したサーバー
-      }, null, 2)
-    }]
-  };
+  const servers = overpassClient.servers;
+  let lastError = null;
+  
+  for (const server of servers) {
+    try {
+      // utils/file-downloader.jsのdownloadToFileを使用
+      const result = await downloadToFile(
+        server.url,
+        fullQuery,
+        output_path,
+        { 'Host': server.host }
+      );
+      
+      // LLMにはメタデータのみを返す
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            status: 'success',
+            message: 'データをダウンロードしました',
+            file: output_path,           // ファイルパス
+            size: result.size,           // ファイルサイズ
+            server: server.host          // 使用したサーバー
+          }, null, 2)
+        }]
+      };
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  
+  throw new Error(`All servers failed: ${lastError?.message}`);
 }
 ```
 
@@ -62,16 +82,30 @@ export async function downloadOSMData(overpassClient, args) {
 ```javascript
 // src/tools/buildings.js の実装例
 export async function getBuildings(overpassClient, args) {
-  const { output_path } = args;
+  const { minLon, minLat, maxLon, maxLat, building_type = 'all', limit, output_path } = args;
+  
+  // 入力検証とクエリ構築
+  const validation = validateCommonInputs(args);
+  const normalizedLimit = validation.normalizedLimit;
+  
+  let buildingFilter = building_type !== 'all' ? `["building"="${building_type}"]` : '["building"]';
+  const outStatement = normalizedLimit ? `out body ${normalizedLimit};` : 'out body;';
+  
+  const query = `[timeout:180][maxsize:1073741824];
+(
+  way${buildingFilter}(${minLat},${minLon},${maxLat},${maxLon});
+);
+${outStatement}
+>;
+out skel qt;`;
   
   if (output_path) {
-    // ファイル保存モード
-    const result = await overpassClient.queryToFile(query, output_path);
+    // ファイル保存モード：utils/file-downloader.jsのexecuteGeoJSONQueryを使用
+    if (!output_path.endsWith('.geojson')) {
+      throw new Error('ファイル出力は .geojson 形式のみサポートしています。');
+    }
     
-    // データをGeoJSONに変換して保存
-    const osmData = JSON.parse(await fs.readFile(output_path, 'utf8'));
-    const geojson = osmtogeojson(osmData);
-    await fs.writeFile(output_path, JSON.stringify(geojson, null, 2));
+    const result = await executeGeoJSONQuery(overpassClient, query, output_path);
     
     // メタデータのみを返す
     return {
@@ -79,26 +113,34 @@ export async function getBuildings(overpassClient, args) {
         type: 'text',
         text: JSON.stringify({
           status: 'success',
+          message: '建物データをダウンロードしました',
           file: output_path,
           size: result.size,
-          feature_count: geojson.features.length,  // 地物数
-          bbox: [minLon, minLat, maxLon, maxLat]    // 境界ボックス
+          feature_count: result.feature_count,  // 地物数
+          limit_applied: normalizedLimit,
+          is_truncated: normalizedLimit ? result.feature_count >= normalizedLimit : false,
+          building_type: building_type,
+          bbox: [minLon, minLat, maxLon, maxLat],    // 境界ボックス
+          server: result.server
         }, null, 2)
       }]
     };
   } else {
     // 従来モード：データを直接返す
-    const osmData = await overpassClient.query(query);
+    const osmData = await overpassClient.query(`[out:json];${query}`, false, 'get_buildings');
     const geojson = osmToGeoJSON(osmData);
+    
+    const response = createGeoJSONResponse(geojson, {
+      building_type: building_type,
+      limit_applied: normalizedLimit,
+      is_truncated: normalizedLimit ? geojson.features.length >= normalizedLimit : false,
+      bbox: [minLon, minLat, maxLon, maxLat]
+    });
     
     return {
       content: [{
         type: 'text',
-        text: JSON.stringify({
-          type: 'geojson',
-          data: geojson,
-          summary: { ... }
-        }, null, 2)
+        text: JSON.stringify(response, null, 2)
       }]
     };
   }
@@ -109,18 +151,50 @@ export async function getBuildings(overpassClient, args) {
 
 ### ストリーミング保存の実装
 ```javascript
-async function downloadToFile(url, query, outputPath, headers = {}) {
+// src/utils/file-downloader.js の実装
+export async function downloadToFile(url, query, outputPath, headers = {}) {
   return new Promise((resolve, reject) => {
+    const urlObj = new URL(url);
+    
+    const options = {
+      hostname: urlObj.hostname,
+      port: 443,
+      path: urlObj.pathname,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain',
+        'Content-Length': Buffer.byteLength(query),
+        'User-Agent': 'OSM-MCP/1.0',
+        ...headers
+      },
+      rejectUnauthorized: false
+    };
+
     const req = https.request(options, (res) => {
+      if (res.statusCode !== 200) {
+        reject(new Error(`HTTP ${res.statusCode}: ${res.statusMessage}`));
+        return;
+      }
+
       // ディレクトリ作成
       const dir = path.dirname(outputPath);
       fs.mkdir(dir, { recursive: true }).then(() => {
         const writeStream = createWriteStream(outputPath);
-        
+        let downloadedBytes = 0;
+
+        res.on('data', (chunk) => {
+          downloadedBytes += chunk.length;
+          // 1MBごとに進行状況を出力
+          if (downloadedBytes > 0 && downloadedBytes % (1024 * 1024) === 0) {
+            console.error(`Downloaded: ${(downloadedBytes / 1024 / 1024).toFixed(1)} MB`);
+          }
+        });
+
         // ストリーミングでファイル書き込み
         res.pipe(writeStream);
         
         writeStream.on('finish', () => {
+          const sizeMB = (downloadedBytes / 1024 / 1024).toFixed(2);
           resolve({ 
             success: true, 
             path: outputPath, 
@@ -128,9 +202,13 @@ async function downloadToFile(url, query, outputPath, headers = {}) {
             bytes: downloadedBytes 
           });
         });
-      });
+
+        writeStream.on('error', reject);
+      }).catch(reject);
     });
     
+    req.on('error', reject);
+    req.setTimeout(300000); // 5分のタイムアウト
     req.write(query);
     req.end();
   });
@@ -245,9 +323,13 @@ function createToolResponse(data, metadata) {
 
 ### 使用例
 
-- ツール名: `download_osm_geojson`
-- パラメータ: `bbox` (境界ボックス), `output_path` (出力ファイルパス)
-- 結果: 指定されたbbox内のOSMデータがGeoJSONとしてoutput_pathに保存。
+- **データ取得ツール**: `get_buildings`, `get_roads`, `get_amenities`等
+  - パラメータ: `minLon`, `minLat`, `maxLon`, `maxLat` (境界ボックス), `output_path` (出力ファイルパス・オプション)
+  - 結果: 指定エリア内のデータがGeoJSONとして保存、またはJSON応答として返却
+
+- **専用ダウンロードツール**: `download_osm_data`, `download_area_all`
+  - パラメータ: `query` (Overpass QL) または境界ボックス, `output_path` (出力ファイルパス・必須)
+  - 結果: ダウンロードしたデータをファイル保存、メタデータを応答として返却
 
 このフローにより、LLMは直接コードを書かずにOSMデータを扱うことができます。
 

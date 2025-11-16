@@ -5,11 +5,13 @@
 ## 概要
 
 全体的な流れは以下の通りです。
-1.  LLMがMCPプロトコルを通じてサーバーにリクエストを送信します。
-2.  サーバーはリクエストを解釈し、指定されたツールを実行します。
-3.  ツールは、キャッシュの確認、Overpass APIへの問い合わせ、データ取得を行います。
-4.  取得したデータをGeoJSON形式に変換します。
-5.  変換したデータをファイルに保存し、そのパスをLLMに返却します。
+1.  LLMがMCPプロトコルで利用可能ツール一覧を取得します。
+2.  サーバーは12個のツールスキーマ（機能・パラメータ定義）を返却します。
+3.  LLMがユーザーリクエストに基づいて最適なツールを自動選択します。
+4.  サーバーは選択されたツール（例：`get_buildings`）を実行します。
+5.  ツールは、キャッシュ確認、Overpass API問い合わせ、データ取得を行います。
+6.  取得したデータをGeoJSON形式に変換します。
+7.  変換したデータをファイルに保存し、そのパスをLLMに返却します。
 
 ---
 
@@ -22,39 +24,64 @@
     -   `index.js`がアプリケーションを起動し、`OSMGeoJSONServer`のインスタンスを生成します。
     -   LLMからMCP経由でツール実行リクエスト（例: `download`ツールで特定の地域の建物を取得）がサーバーに到着します。
 
-### 2. ツール実行とプロンプト解析 (Tool Execution and Prompt Parsing)
+### 2. ツール発見とスキーマ提供 (Tool Discovery and Schema Provision)
 
--   **担当ファイル:** `src/tools/index.js`, `src/tools/download.js` (または他のツール)
+-   **担当ファイル:** `src/server/OSMGeoJSONServer.js`, `src/tools/index.js`
 -   **処理内容:**
-    -   `OSMGeoJSONServer`は、リクエストで指定されたツール（例: `download`）を`src/tools/`から選択して実行します。
-    -   **`utils/validator.js`**: 受信したパラメータが有効かどうか（例: BBOXの形式が正しいか、必須タグが含まれているか）を検証します。不正な場合はエラーを返します。
+    -   LLMは利用可能なツールを発見するため、MCPプロトコルで`list_tools`リクエストを送信します
+    -   **`OSMGeoJSONServer`**の`ListToolsRequestSchema`ハンドラーが応答し、`src/tools/index.js`の`toolSchemas`配列を返します
+    -   この配列には全12個のツールスキーマ（`get_buildings`, `get_roads`, `download_osm_data`等）が含まれます
+    -   各スキーマには以下が定義されています：
+        - `name`: ツール名（例: `get_buildings`）
+        - `description`: 機能説明（「建物データを取得します」等）
+        - `inputSchema`: 必須パラメータ（`minLon`, `minLat`等）と型定義
 
-### 3. キャッシュ確認 (Cache Check)
+### 3. LLMによるツール選択 (LLM Tool Selection)
 
--   **担当ファイル:** `src/tools/download.js`
 -   **処理内容:**
-    -   **`utils/cache.js`**: ネットワークリクエストを発行する前に、同じクエリパラメータでのリクエストが過去に実行されていないかキャッシュを確認します。キャッシュが存在すれば、その結果（ファイルパス）を返し、処理はステップ7にジャンプします。
+    -   LLMは受け取ったスキーマリストから、ユーザーのリクエストに最適なツールを**自動選択**します
+    -   選択基準：
+        - **機能マッチング**: 「建物データが欲しい」→ `get_buildings`
+        - **出力形式**: 「ファイルに保存」→ `output_path`パラメータ付きで呼び出し
+        - **データ範囲**: 座標指定があれば境界ボックスパラメータを設定
+    -   例：「東京の建物をファイル保存」→ `get_buildings` + `output_path`パラメータ
 
-### 4. データ取得 (Data Acquisition)
+### 4. ツール実行とパラメータ検証 (Tool Execution and Parameter Validation)
 
--   **担当ファイル:** `src/tools/download.js`
+-   **担当ファイル:** `src/server/OSMGeoJSONServer.js`, `src/tools/index.js`
 -   **処理内容:**
-    -   キャッシュが存在しない場合、`download.js`はOverpass APIへの問い合わせを実行します。
-    -   **`utils/overpass.js`**: ステップ2で解析・検証されたパラメータを基に、Overpass QL (Query Language) を動的に生成し、Overpass APIサーバーにHTTPリクエストを送信してOSMデータをダウンロードします。
+    -   LLMが選択したツール名とパラメータでMCP `call_tool`リクエストを送信
+    -   **`OSMGeoJSONServer`**の`CallToolRequestSchema`ハンドラーが受信
+    -   **`tools/index.js`**の`executeTool`関数がツール名でハンドラー関数をルックアップ
+    -   **`toolHandlers`**オブジェクトから対応する実装関数（例：`getBuildings`）を取得・実行
+    -   **`utils/validator.js`**: 各ツール内で`validateCommonInputs()`が座標・制限値等を検証
 
-### 5. データ変換 (Data Conversion)
+### 5. キャッシュ確認 (Cache Check)
+
+-   **担当ファイル:** `src/tools/download.js`等
+-   **処理内容:**
+    -   **`utils/cache.js`**: ネットワークリクエストを発行する前に、同じクエリパラメータでのリクエストが過去に実行されていないかキャッシュを確認します。キャッシュが存在すれば、その結果（ファイルパス）を返し、処理はステップ9にジャンプします。
+
+### 6. データ取得 (Data Acquisition)
+
+-   **担当ファイル:** 各ツール（`src/tools/buildings.js`等）
+-   **処理内容:**
+    -   キャッシュが存在しない場合、選択されたツールがOverpass APIへの問い合わせを実行します。
+    -   **`utils/overpass.js`**: ステップ4で検証されたパラメータを基に、Overpass QL (Query Language) を動的に生成し、Overpass APIサーバーにHTTPリクエストを送信してOSMデータをダウンロードします。
+
+### 7. データ変換 (Data Conversion)
 
 -   **担当ファイル:** `src/tools/convert.js` (内部的に利用)
 -   **処理内容:**
     -   **`utils/converter.js`**: `overpass.js`がOverpass APIから取得したOSMデータ（通常はXMLまたはJSON形式）を、標準的な地理空間データフォーマットであるGeoJSON形式に変換します。
 
-### 6. ファイル保存 (File Saving)
+### 8. ファイル保存 (File Saving)
 
--   **担当ファイル:** `src/tools/download.js`
+-   **担当ファイル:** 各ツール（`output_path`指定時）
 -   **処理内容:**
-    -   **`utils/file-downloader.js`**: ステップ5で変換されたGeoJSONデータを、一意のファイル名を持つファイル（`.geojson`）としてファイルシステム上に保存します。また、このタイミングで`utils/cache.js`を呼び出し、新しい結果をキャッシュに保存します。
+    -   **`utils/file-downloader.js`**: ステップ7で変換されたGeoJSONデータを、一意のファイル名を持つファイル（`.geojson`）としてファイルシステム上に保存します。また、このタイミングで`utils/cache.js`を呼び出し、新しい結果をキャッシュに保存します。
 
-### 7. レスポンス返却 (Response Return)
+### 9. レスポンス返却 (Response Return)
 
 -   **担当ファイル:** `src/server/OSMGeoJSONServer.js`
 -   **処理内容:**

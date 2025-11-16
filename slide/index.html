@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCPサーバーでの外部APIデータ取得時のトークン消費最適化</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/black.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/monokai.min.css">
+    <style>
+        .reveal {
+            font-size: 32px;
+        }
+        .reveal h1 {
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .reveal h2 {
+            font-size: 1.8em;
+            color: #42affa;
+        }
+        .reveal h3 {
+            font-size: 1.4em;
+            color: #ffa500;
+        }
+        .reveal pre {
+            font-size: 0.5em;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        .reveal code {
+            font-family: 'Courier New', monospace;
+        }
+        .problem {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+        .solution {
+            color: #51cf66;
+            font-weight: bold;
+        }
+        .highlight-box {
+            background: rgba(66, 175, 250, 0.1);
+            border-left: 5px solid #42affa;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .comparison-table {
+            width: 100%;
+            margin: 20px 0;
+        }
+        .comparison-table td {
+            padding: 15px;
+            border: 1px solid #42affa;
+        }
+        .benefit-list li {
+            margin: 15px 0;
+            text-align: left;
+        }
+        .metric {
+            font-size: 1.5em;
+            color: #51cf66;
+            font-weight: bold;
+        }
+        .warning {
+            color: #ffa500;
+        }
+        .fragment.highlight-current-red.visible:not(.current-fragment) {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            
+            <!-- タイトルスライド -->
+            <section>
+                <h1>MCPサーバーでの外部APIデータ取得時の<br>トークン消費最適化</h1>
+                <p>大容量データをファイル保存で効率化する方法</p>
+            </section>
+
+            <!-- 目次 -->
+            <section>
+                <h2>目次</h2>
+                <ol>
+                    <li>問題の概要</li>
+                    <li>従来のアプローチとその課題</li>
+                    <li>解決策：ファイル保存アプローチ</li>
+                    <li>実装パターン</li>
+                    <li>技術的詳細</li>
+                    <li>効果とメリット</li>
+                    <li>実装のベストプラクティス</li>
+                </ol>
+            </section>
+
+            <!-- 問題の概要 -->
+            <section>
+                <section>
+                    <h2>問題の概要</h2>
+                    <p>MCPサーバーで外部APIからデータを取得する際の課題</p>
+                </section>
+
+                <section>
+                    <h3 class="problem">❌ 何が問題なのか？</h3>
+                    <ul>
+                        <li class="fragment">APIレスポンスを<strong>直接LLMに渡してしまう</strong></li>
+                        <li class="fragment">大量のトークンを消費</li>
+                        <li class="fragment">コンテキストウィンドウを圧迫</li>
+                        <li class="fragment">パフォーマンス低下とコスト増加</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>具体的な数字</h3>
+                    <div class="highlight-box">
+                        <p class="metric">1MBのJSONデータ ≈ 25万トークン</p>
+                        <p class="fragment">💰 トークンコストが急増</p>
+                        <p class="fragment">⏱️ LLMの応答が遅延</p>
+                        <p class="fragment">⚠️ エラー発生リスク増大</p>
+                    </div>
+                </section>
+            </section>
+
+            <!-- 従来のアプローチ -->
+            <section>
+                <section>
+                    <h2>従来のアプローチとその課題</h2>
+                </section>
+
+                <section>
+                    <h3 class="problem">問題のある実装例</h3>
+                    <pre><code class="language-javascript" data-trim>
+// ❌ 大量のトークンを消費してしまう
+const apiResponse = await fetchExternalAPI();
+
+return {
+  content: [{
+    type: 'text',
+    text: JSON.stringify(apiResponse, null, 2)
+    // ↑ 巨大なデータを直接LLMに渡している！
+  }]
+};
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h3>何が起こるか？</h3>
+                    <table class="comparison-table">
+                        <tr>
+                            <td>📊 データサイズ</td>
+                            <td class="warning">数MB〜数十MB</td>
+                        </tr>
+                        <tr>
+                            <td>🎫 トークン消費</td>
+                            <td class="warning">10万〜100万トークン以上</td>
+                        </tr>
+                        <tr>
+                            <td>💵 コスト</td>
+                            <td class="warning">数十円〜数百円/リクエスト</td>
+                        </tr>
+                        <tr>
+                            <td>⏱️ レスポンス</td>
+                            <td class="warning">遅延またはタイムアウト</td>
+                        </tr>
+                    </table>
+                </section>
+            </section>
+
+            <!-- 解決策 -->
+            <section>
+                <section>
+                    <h2 class="solution">✅ 解決策：ファイル保存アプローチ</h2>
+                </section>
+
+                <section>
+                    <h3>基本的な考え方</h3>
+                    <ol class="benefit-list">
+                        <li class="fragment"><strong>APIレスポンスをファイルに保存</strong></li>
+                        <li class="fragment"><strong>LLMにはファイルパスとメタデータのみ返す</strong></li>
+                        <li class="fragment"><strong>大容量データをコンテキスト外に保持</strong></li>
+                    </ol>
+                </section>
+
+                <section>
+                    <h3>アーキテクチャ図</h3>
+                    <div style="text-align: left; font-size: 0.8em;">
+                        <pre>
+外部API
+   ↓
+[ストリーミング取得]
+   ↓
+ファイルシステム
+   ↓
+メタデータのみ抽出
+   ↓
+LLM (コンテキスト: 最小限)
+                        </pre>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>トークン消費の比較</h3>
+                    <table class="comparison-table">
+                        <tr>
+                            <td><strong>従来方式</strong></td>
+                            <td><strong>ファイル保存方式</strong></td>
+                        </tr>
+                        <tr>
+                            <td class="problem">25万トークン<br>(1MBのJSON)</td>
+                            <td class="solution">200トークン<br>(メタデータのみ)</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="solution">
+                                <strong>99.9%削減！</strong>
+                            </td>
+                        </tr>
+                    </table>
+                </section>
+            </section>
+
+            <!-- 実装パターン -->
+            <section>
+                <section>
+                    <h2>実装パターン</h2>
+                </section>
+
+                <section>
+                    <h3>パターン1: ダウンロード専用ツール</h3>
+                    <pre><code class="language-javascript" data-trim data-line-numbers="1-4|6-7|9-18">
+export async function downloadOSMData(overpassClient, args) {
+  const { query, output_path } = args;
+  
+  // APIからデータを取得し、ファイルにストリーミング保存
+  const result = await downloadToFile(
+    server.url, fullQuery, output_path
+  );
+  
+  // LLMにはメタデータのみを返す
+  return {
+    content: [{
+      type: 'text',
+      text: JSON.stringify({
+        status: 'success',
+        file: output_path,
+        size: result.size,
+        server: server.host
+      }, null, 2)
+    }]
+  };
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h3>パターン2: オプションのファイル出力</h3>
+                    <pre><code class="language-javascript" data-trim data-line-numbers="1-2|4-16|17-24">
+export async function getBuildings(overpassClient, args) {
+  const { output_path } = args;
+  
+  if (output_path) {
+    // ファイル保存モード
+    const result = await overpassClient.queryToFile(
+      query, output_path
+    );
+    
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify({
+          file: output_path,
+          feature_count: geojson.features.length
+        }, null, 2)
+      }]
+    };
+  } else {
+    // 従来モード：データを直接返す
+    const osmData = await overpassClient.query(query);
+    const geojson = osmToGeoJSON(osmData);
+    return { content: [{ type: 'text', text: JSON.stringify(geojson) }] };
+  }
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h3>どちらのパターンを選ぶべきか？</h3>
+                    <table class="comparison-table">
+                        <tr>
+                            <td><strong>ダウンロード専用</strong></td>
+                            <td><strong>オプション機能</strong></td>
+                        </tr>
+                        <tr>
+                            <td>常に大容量データを扱う</td>
+                            <td>データサイズが可変</td>
+                        </tr>
+                        <tr>
+                            <td>シンプルな実装</td>
+                            <td>柔軟性が高い</td>
+                        </tr>
+                        <tr>
+                            <td>例: 地図データダウンロード</td>
+                            <td>例: 検索結果の取得</td>
+                        </tr>
+                    </table>
+                </section>
+            </section>
+
+            <!-- 技術的詳細 -->
+            <section>
+                <section>
+                    <h2>技術的詳細</h2>
+                </section>
+
+                <section>
+                    <h3>ストリーミング保存の実装</h3>
+                    <pre><code class="language-javascript" data-trim data-line-numbers="1-3|5-8|10-12|14-20">
+async function downloadToFile(url, query, outputPath) {
+  return new Promise((resolve, reject) => {
+    const req = https.request(options, (res) => {
+      
+      // ディレクトリ作成
+      const dir = path.dirname(outputPath);
+      await fs.mkdir(dir, { recursive: true });
+      
+      const writeStream = createWriteStream(outputPath);
+      
+      // ストリーミングでファイル書き込み
+      res.pipe(writeStream);
+      
+      writeStream.on('finish', () => {
+        resolve({ 
+          success: true, 
+          path: outputPath, 
+          size: `${sizeMB} MB`,
+          bytes: downloadedBytes 
+        });
+      });
+    });
+    
+    req.write(query);
+    req.end();
+  });
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h3>メタデータの設計</h3>
+                    <pre><code class="language-javascript" data-trim>
+// 効果的なメタデータ構造
+const metadata = {
+  status: 'success',
+  message: 'データをダウンロードしました',
+  file: './path/to/file.json',
+  size: '1.23 MB',
+  feature_count: 456,
+  bbox: [minLon, minLat, maxLon, maxLat],
+  server: 'overpass-api.de',
+  timestamp: '2025-01-01T00:00:00Z'
+};
+                    </code></pre>
+                    <p class="fragment">💡 <strong>必要最小限の情報のみをLLMに渡す</strong></p>
+                </section>
+
+                <section>
+                    <h3>メタデータに含めるべき情報</h3>
+                    <ul class="benefit-list">
+                        <li>✅ ファイルパス（必須）</li>
+                        <li>✅ ファイルサイズ</li>
+                        <li>✅ データ件数や要約情報</li>
+                        <li>✅ 空間範囲（地理データの場合）</li>
+                        <li>✅ データソース情報</li>
+                        <li>❌ 実データそのもの</li>
+                    </ul>
+                </section>
+            </section>
+
+            <!-- 効果とメリット -->
+            <section>
+                <section>
+                    <h2>効果とメリット</h2>
+                </section>
+
+                <section>
+                    <h3>1. トークン消費の大幅削減</h3>
+                    <div class="highlight-box">
+                        <p class="metric">最大99%以上のトークン節約</p>
+                        <ul style="text-align: left; margin-top: 20px;">
+                            <li>大容量データをコンテキストから除外</li>
+                            <li>メタデータのみで十分な情報提供</li>
+                            <li>コスト削減効果が絶大</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>2. パフォーマンス向上</h3>
+                    <ul class="benefit-list">
+                        <li>🚀 <strong>LLMの応答速度向上</strong><br>
+                        コンテキストが軽量になる</li>
+                        <li>💪 <strong>大容量データでも安定動作</strong><br>
+                        タイムアウトリスク低減</li>
+                        <li>📉 <strong>メモリ使用量の最適化</strong><br>
+                        システムリソースを効率活用</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>3. 柔軟なデータ活用</h3>
+                    <ul class="benefit-list">
+                        <li>📁 ファイルとして後続処理可能</li>
+                        <li>🔄 必要に応じてデータを再読み込み</li>
+                        <li>🔗 分析ツールとの連携が容易</li>
+                        <li>💾 永続化されたデータの再利用</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>4. エラー耐性向上</h3>
+                    <ul class="benefit-list">
+                        <li>✅ 巨大データによるLLMエラーを回避</li>
+                        <li>✅ タイムアウトリスクの低減</li>
+                        <li>✅ デバッグ情報の簡素化</li>
+                        <li>✅ システムの安定性向上</li>
+                    </ul>
+                </section>
+            </section>
+
+            <!-- ベストプラクティス -->
+            <section>
+                <section>
+                    <h2>実装のベストプラクティス</h2>
+                </section>
+
+                <section>
+                    <h3>1. ツール設計の指針</h3>
+                    <table class="comparison-table">
+                        <tr>
+                            <td><strong>ユースケース</strong></td>
+                            <td><strong>推奨アプローチ</strong></td>
+                        </tr>
+                        <tr>
+                            <td>常に大容量データ</td>
+                            <td>ダウンロード専用ツール</td>
+                        </tr>
+                        <tr>
+                            <td>可変サイズのデータ</td>
+                            <td>オプション機能を追加</td>
+                        </tr>
+                        <tr>
+                            <td>既存ツールの改善</td>
+                            <td>ハイブリッドアプローチ</td>
+                        </tr>
+                    </table>
+                </section>
+
+                <section>
+                    <h3>2. 閾値の設定</h3>
+                    <pre><code class="language-javascript" data-trim>
+function shouldSaveToFile(data) {
+  const dataSize = JSON.stringify(data).length;
+  const featureCount = data.features?.length || 0;
+  
+  // データサイズが1MB以上
+  if (dataSize > 1024 * 1024) return true;
+  
+  // 地物数が1000件以上
+  if (featureCount > 1000) return true;
+  
+  return false;
+}
+                    </code></pre>
+                    <p class="fragment">💡 プロジェクトに応じて適切な閾値を設定</p>
+                </section>
+
+                <section>
+                    <h3>3. セキュリティと信頼性</h3>
+                    <ul class="benefit-list">
+                        <li>🔒 <strong>ファイルパスの検証</strong><br>
+                        ディレクトリトラバーサル防止</li>
+                        <li>⚠️ <strong>適切なエラーハンドリング</strong><br>
+                        失敗時の適切な処理</li>
+                        <li>🗑️ <strong>一時ファイルのクリーンアップ</strong><br>
+                        不要なファイルの削除</li>
+                        <li>🔐 <strong>ファイル権限の適切設定</strong><br>
+                        セキュリティリスクの最小化</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>4. ユーザー体験の向上</h3>
+                    <pre><code class="language-javascript" data-trim>
+// 明確で親切なレスポンスメッセージ
+return {
+  content: [{
+    type: 'text',
+    text: JSON.stringify({
+      status: 'success',
+      message: '建物データを正常にダウンロードしました',
+      file: output_path,
+      size: '2.45 MB',
+      feature_count: 1523,
+      next_steps: [
+        'ファイルを開いてGeoJSONデータを確認できます',
+        'QGISなどのGISソフトで可視化できます'
+      ]
+    }, null, 2)
+  }]
+};
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h3>5. 実装チェックリスト</h3>
+                    <ul class="benefit-list" style="font-size: 0.9em;">
+                        <li>☑️ データサイズを評価している</li>
+                        <li>☑️ 適切な閾値を設定している</li>
+                        <li>☑️ ストリーミング処理を実装している</li>
+                        <li>☑️ メタデータを適切に設計している</li>
+                        <li>☑️ エラーハンドリングが十分</li>
+                        <li>☑️ セキュリティ対策を実施している</li>
+                        <li>☑️ ユーザーへの説明が明確</li>
+                    </ul>
+                </section>
+            </section>
+
+            <!-- まとめ -->
+            <section>
+                <section>
+                    <h2>まとめ</h2>
+                </section>
+
+                <section>
+                    <h3>実装の4つの原則</h3>
+                    <ol class="benefit-list">
+                        <li><strong>データサイズを評価</strong><br>
+                        大容量データの場合はファイル保存を検討</li>
+                        <li><strong>メタデータを設計</strong><br>
+                        ファイルパスと要約情報を効果的に提供</li>
+                        <li><strong>オプション機能</strong><br>
+                        ユーザーが選択できる柔軟性を提供</li>
+                        <li><strong>パフォーマンス最適化</strong><br>
+                        ストリーミング処理で効率化</li>
+                    </ol>
+                </section>
+
+                <section>
+                    <h3>期待できる効果</h3>
+                    <div class="highlight-box">
+                        <p class="metric">トークン消費: 99%削減</p>
+                        <p class="metric">応答速度: 2-5倍向上</p>
+                        <p class="metric">コスト: 90%以上削減</p>
+                        <p class="metric">安定性: 大幅改善</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>ありがとうございました</h2>
+                    <p>この手法により、LLMとの統合がスムーズになり、<br>
+                    コスト効果の高いMCPサーバーを構築できます</p>
+                    <br>
+                    <p style="font-size: 0.8em; color: #42affa;">
+                        質問やフィードバックをお待ちしています
+                    </p>
+                </section>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/notes/notes.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/highlight.min.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            transition: 'slide',
+            backgroundTransition: 'fade',
+            controls: true,
+            progress: true,
+            center: true,
+            slideNumber: 'c/t',
+            plugins: [ RevealHighlight, RevealNotes ],
+            highlight: {
+                highlightOnLoad: true
+            }
+        });
+    </script>
+</body>
+</html>
