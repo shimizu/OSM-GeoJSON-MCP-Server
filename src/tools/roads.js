@@ -3,7 +3,7 @@
 
 import { validateCommonInputs, validateFilter } from '../utils/validator.js';
 import { osmToGeoJSON, createGeoJSONResponse } from '../utils/converter.js';
-import { executeGeoJSONQuery } from './download.js';
+import { executeGeoJSONQuery } from '../utils/file-downloader.js';
 import osmtogeojson from 'osmtogeojson';
 
 export const roadsToolSchema = {

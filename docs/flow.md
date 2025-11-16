@@ -27,8 +27,7 @@
 -   **担当ファイル:** `src/tools/index.js`, `src/tools/download.js` (または他のツール)
 -   **処理内容:**
     -   `OSMGeoJSONServer`は、リクエストで指定されたツール（例: `download`）を`src/tools/`から選択して実行します。
-    -   **`utils/prompt-parser.js`**: この段階で、LLMからの自然言語に近いプロンプトや引数を解析し、Overpass APIクエリに必要な具体的なパラメータ（BBOX、タグなど）を抽出します。
-    -   **`utils/validator.js`**: 解析されたパラメータが有効かどうか（例: BBOXの形式が正しいか、必須タグが含まれているか）を検証します。不正な場合はエラーを返します。
+    -   **`utils/validator.js`**: 受信したパラメータが有効かどうか（例: BBOXの形式が正しいか、必須タグが含まれているか）を検証します。不正な場合はエラーを返します。
 
 ### 3. キャッシュ確認 (Cache Check)
 
@@ -53,7 +52,7 @@
 
 -   **担当ファイル:** `src/tools/download.js`
 -   **処理内容:**
-    -   **`utils/file-handler.js`**: ステップ5で変換されたGeoJSONデータを、一意のファイル名を持つファイル（`.geojson`）としてファイルシステム上に保存します。また、このタイミングで`utils/cache.js`を呼び出し、新しい結果をキャッシュに保存します。
+    -   **`utils/file-downloader.js`**: ステップ5で変換されたGeoJSONデータを、一意のファイル名を持つファイル（`.geojson`）としてファイルシステム上に保存します。また、このタイミングで`utils/cache.js`を呼び出し、新しい結果をキャッシュに保存します。
 
 ### 7. レスポンス返却 (Response Return)
 

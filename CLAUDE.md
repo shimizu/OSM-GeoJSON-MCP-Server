@@ -85,8 +85,7 @@ src/
     ├── validator.js           # 入力検証
     ├── cache.js               # LRUキャッシュ実装
     ├── logger.js              # APIログ・統計
-    ├── prompt-parser.js       # プロンプト解析
-    └── file-handler.js        # ファイル出力処理
+    └── file-downloader.js     # ファイルダウンロード処理
 ```
 
 ### MCP統合
@@ -270,8 +269,7 @@ out skel qt;`;
 - **validator.js**: 共通の入力検証ロジック、limit検証機能
 - **cache.js**: LRUキャッシュ実装、15分TTL管理
 - **logger.js**: API使用状況とエラー追跡
-- **prompt-parser.js**: 自然言語から制限値抽出
-- **file-handler.js**: ファイル出力処理の共通化
+- **file-downloader.js**: HTTPSファイルダウンロードとGeoJSON変換の共通処理
 - **tools/index.js**: ツールの統合と実行ディスパッチ
 
 ### パフォーマンス考慮事項
