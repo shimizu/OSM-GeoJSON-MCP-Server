@@ -26,6 +26,8 @@
         .reveal pre {
             font-size: 0.45em;
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            max-height: 50vh;
+            overflow-y: auto;
         }
         .highlight-box {
             background: rgba(66, 175, 250, 0.1);
@@ -74,6 +76,7 @@
             font-weight: bold;
             margin-right: 10px;
         }
+
     </style>
 </head>
 <body>
@@ -103,11 +106,6 @@
                             <li><strong>AIエージェント主導</strong>で段階的に機能を実装</li>
                         </ul>
                     </div>
-                </div>
-                <div class="solution-box">
-                    <p style="margin: 0; text-align: center; font-size: 0.9em;">
-                        <strong>AIエージェントの利点:</strong> 効率的な開発、ベストプラクティスの提案、包括的なテスト実装
-                    </p>
                 </div>
                 <div class="problem-box">
                     <p style="margin: 0; text-align: center;">
@@ -145,26 +143,6 @@ export async function getBuildings(client, args) {
                     </p>
                 </div>
 
-                <div class="grid-2">
-                    <div>
-                        <h4>実際に起きた問題</h4>
-                        <ul style="font-size: 0.8em; text-align: left;">
-                            <li>建物数: 1,234件</li>
-                            <li>GeoJSONサイズ: 2.3MB</li>
-                            <li>トークン数: 約575,000</li>
-                            <li>コスト: $11.50/リクエスト</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 style="color: #ff6b6b;">深刻な影響</h4>
-                        <ul style="font-size: 0.8em; text-align: left; color: #ff6b6b;">
-                            <li>コンテキスト圧迫</li>
-                            <li>応答速度低下（5-10秒）</li>
-                            <li>タイムアウトリスク</li>
-                            <li>使用不可能なコスト</li>
-                        </ul>
-                    </div>
-                </div>
             </section>
 
             <!-- 大容量APIの考慮事項 -->
@@ -202,18 +180,11 @@ export async function getBuildings(client, args) {
                         </div>
                     </div>
                 </div>
-
-                <div class="solution-box">
-                    <p style="margin: 0; text-align: center;">
-                        <strong>教訓:</strong> AIエージェントと開発する際も、大容量APIの特性は<br>
-                        <strong>人間が事前に考慮して指示する必要がある</strong>
-                    </p>
-                </div>
             </section>
 
             <!-- ファイル保存手法の解決策 -->
             <section>
-                <h2>ファイル保存手法による解決策</h2>
+                <h2>　Toolの仕様を変更</h2>
                 
                 <div class="solution-box">
                     <h3 style="margin-top: 0; color: #51cf66;">✅ 新しい仕様: ファイル保存 + メタデータ返却</h3>
@@ -244,25 +215,64 @@ export async function getBuildings(client, args) {
                 </div>
                 
                 <div class="highlight-box">
-                    <h3 style="margin-top: 0;">💡 ファイル保存手法の核心</h3>
+                    <h3 style="margin-top: 0;">💡 APIリクエスト時の処理</h3>
                     <p style="margin: 0; text-align: center; font-size: 0.9em;">
                         <strong>大容量データ → ファイル保存</strong><br>
                         <strong>LLMには → メタデータのみ返却</strong><br>
-                        <strong>結果 → トークン消費を劇的に削減</strong>
                     </p>
                 </div>
                 
-                <div class="metric" style="color: #51cf66;">
-                    トークン使用量: 575,000 → 200 (99.97%削減)
+            </section>
+
+            <!-- executeGeoJSONQuery の説明 -->
+            <section>
+                <h2>ファイル保存前の変換処理</h2>
+                
+                <div class="highlight-box">
+                    <h3 style="margin-top: 0;">🔄 OSMデータ → GeoJSONファイル変換フロー</h3>
+                    <pre><code class="language-javascript" data-trim>
+export async function executeGeoJSONQuery(overpassClient, query, outputPath) {
+  // 1. OSMデータを一時ファイルにダウンロード
+  const tempPath = outputPath + '.tmp.osm.json';
+  await downloadToFile(server.url, fullQuery, tempPath);
+  
+  // 2. OSMデータを読み込み
+  const osmData = JSON.parse(await fs.readFile(tempPath));
+  
+  // 3. GeoJSONに変換
+  const geojson = osmtogeojson(osmData);
+  
+  // 4. 最終ファイルに保存
+  await fs.writeFile(outputPath, JSON.stringify(geojson, null, 2));
+  
+  // 5. 一時ファイル削除
+  await fs.unlink(tempPath);
+  
+  return {
+    size: `${(Buffer.byteLength(JSON.stringify(geojson))/1024/1024).toFixed(2)} MB`,
+    feature_count: geojson.features.length
+  };
+}
+                    </code></pre>
+                </div>
+
+                <div class="solution-box">
+                    <h3 style="margin-top: 0;">💡 なぜ2段階処理？</h3>
+                        <div class="tool-list">
+                            <ul>
+                                <li>OSMのデータ形式 → 標準GeoJSON形式</li>
+                                <li>地理情報システムで利用可能なフォーマットに</li>
+                            </ul>
+                        </div>
                 </div>
             </section>
 
             <!-- ファイル保存手法の実装詳細 -->
             <section>
-                <h2>ファイル保存手法の実装詳細</h2>
+                <h2>ファイル保存処理</h2>
                 
                 <div class="highlight-box">
-                    <h3 style="margin-top: 0;">utils/file-downloader.js の核心実装</h3>
+                    <h3 style="margin-top: 0;">utils/file-downloader.js</h3>
                     <pre><code class="language-javascript" data-trim>
 export async function downloadToFile(url, query, outputPath) {
   return new Promise((resolve, reject) => {
@@ -298,66 +308,25 @@ export async function downloadToFile(url, query, outputPath) {
 
                 <div class="solution-box">
                     <h3 style="margin-top: 0;">🎯 ファイル保存手法の利点</h3>
-                    <div class="grid-2">
                         <div class="tool-list">
                             <ul>
                                 <li><strong>メモリ効率</strong>: ストリーミング処理</li>
-                                <li><strong>スケーラブル</strong>: 数百MB対応</li>
                                 <li><strong>高速</strong>: 直接ディスク書き込み</li>
                             </ul>
                         </div>
-                        <div class="tool-list">
-                            <ul>
-                                <li><strong>トークン節約</strong>: 99.9%削減</li>
-                                <li><strong>コスト削減</strong>: $11→$0.004</li>
-                                <li><strong>安定性</strong>: タイムアウト回避</li>
-                            </ul>
-                        </div>
-                    </div>
                 </div>
             </section>
 
-            <!-- ファイル保存手法のアーキテクチャ -->
-            <section>
-                <h2>ファイル保存手法のアーキテクチャ</h2>
-                
-                <div style="font-size: 0.7em; text-align: left; font-family: monospace;">
-                    <pre style="background: rgba(66, 175, 250, 0.1); padding: 20px; border-radius: 8px;">
-🌍 大容量API (Overpass API)
-   ↓ 🚨 従来: 直接LLMに返却 (575,000トークン)
-   ↓ ✅ 新手法: ファイル保存
-📦 utils/file-downloader.js
-   ├─ downloadToFile() - HTTPSストリーミングダウンロード  
-   └─ executeGeoJSONQuery() - OSM→GeoJSON変換+保存
-   ↓
-💾 output.geojson (2.3MB) ← 大容量データをファイルに保存
-   ↓
-🤖 LLMには軽量なメタデータのみ (200トークン)
-   {
-     "file": "./buildings.geojson",  ← ファイルパス
-     "size": "2.3 MB",              ← サイズ情報 
-     "feature_count": 1234          ← サマリー
-   }
-                    </pre>
-                </div>
-                
-                <div class="solution-box">
-                    <p style="margin: 0; text-align: center; font-size: 0.9em;">
-                        <strong>ファイル保存手法の核心:</strong> 大容量データをLLMコンテキスト外に保持し、<br>
-                        <strong>必要最小限のメタデータのみをLLMに提供</strong>
-                    </p>
-                </div>
-            </section>
 
             <!-- ファイル保存手法の適用結果 -->
             <section>
                 <h2>ファイル保存手法の適用結果</h2>
                 
                 <div class="solution-box">
-                    <h3 style="margin-top: 0;">🎯 12種類のツール全てにファイル保存手法を適用</h3>
+                    <h3 style="margin-top: 0;">🎯ツールとユーティリティ</h3>
                     <div class="grid-2">
                         <div class="tool-list">
-                            <h4>📍 大容量データ対応ツール</h4>
+                            <h4>📍 データダウンロードツール</h4>
                             <ul>
                                 <li>get_buildings（建物）</li>
                                 <li>get_roads（道路）</li>
@@ -370,7 +339,7 @@ export async function downloadToFile(url, query, outputPath) {
                         <div class="tool-list">
                             <h4>🛠️ ファイル処理ユーティリティ</h4>
                             <ul>
-                                <li>download_osm_data（生データ）</li>
+                                <li>download_osm_data（ロード）</li>
                                 <li>convert_to_geojson（変換）</li>
                                 <li>test_connection（接続テスト）</li>
                                 <li>get_api_stats（統計）</li>
