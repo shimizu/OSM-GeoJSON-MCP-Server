@@ -56,7 +56,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 30px;
-            align-items: center;
+            align-items: start;
         }
         .tool-list {
             text-align: left;
@@ -85,8 +85,7 @@
             
             <!-- タイトルスライド -->
             <section>
-                <h1>大容量APIデータを<br>LLMに渡さず<br>ファイル保存する手法</h1>
-                <h2 style="color: #ffa500;">AIエージェントでMCP開発した際の<br>重要な気づきと解決策</h2>
+                <h1>AIエージェントでMCPサーバーを開発した際のトラブルと解決策</h1>
                 <p style="margin-top: 40px; font-size: 0.8em; color: #42affa;">
                     OpenStreetMap MCP開発での実体験
                 </p>
@@ -320,14 +319,15 @@ export async function downloadToFile(url, query, outputPath) {
 
             <!-- ファイル保存手法の適用結果 -->
             <section>
-                <h2>ファイル保存手法の適用結果</h2>
+                <h2>最終的なMCPの仕様</h2>
                 
                 <div class="solution-box">
                     <h3 style="margin-top: 0;">🎯ツールとユーティリティ</h3>
                     <div class="grid-2">
                         <div class="tool-list">
-                            <h4>📍 データダウンロードツール</h4>
+                            <h4>📍 ツール</h4>
                             <ul>
+                                <li>test_connection（接続テスト）</li>
                                 <li>get_buildings（建物）</li>
                                 <li>get_roads（道路）</li>
                                 <li>get_amenities（施設）</li>
@@ -337,224 +337,57 @@ export async function downloadToFile(url, query, outputPath) {
                             </ul>
                         </div>
                         <div class="tool-list">
-                            <h4>🛠️ ファイル処理ユーティリティ</h4>
+                            <h4>🛠️ ユーティリティ</h4>
                             <ul>
-                                <li>download_osm_data（ロード）</li>
-                                <li>convert_to_geojson（変換）</li>
-                                <li>test_connection（接続テスト）</li>
-                                <li>get_api_stats（統計）</li>
+                                <li>file-downloader(ダウンロード)</li>
+                                <li>converter（変換）</li>
+                                <li>overpass(API管理)</li>
+                                <li>cache（キャシング）</li>
+                                <li>logger(ログ保存)</li>
+                                <li>validator(入力検証)</li>
                             </ul>
                         </div>
                     </div>
                 </div>
                 
-                <div class="highlight-box">
-                    <p style="margin: 0; text-align: center;">
-                        <strong>統一設計: 全ツールでoptional output_pathパラメータ</strong><br>
-                        小さなデータ: JSON直接返却 | 大容量データ: ファイル保存手法
-                    </p>
-                </div>
 
-                <div class="problem-box">
-                    <p style="margin: 0; text-align: center; font-size: 0.9em;">
-                        <strong>重要:</strong> どのツールでも1MB以上のデータが想定される場合、<br>
-                        <strong>ファイル保存手法の適用を強く推奨</strong>
-                    </p>
-                </div>
             </section>
 
-            <!-- ファイル保存手法の開発で学んだ教訓 -->
+            <!-- 　MCPサーバー開発で学んだ教訓 -->
             <section>
-                <h2>ファイル保存手法の開発で学んだ教訓</h2>
+                <h2>MCPサーバー開発で学んだ教訓</h2>
                 
-                <div class="grid-2">
                     <div>
                         <div class="highlight-box">
                             <h3 style="margin-top: 0;">🤖 AIエージェントの盲点</h3>
                             <p style="font-size: 0.8em;">AIエージェントはコードを書くことはできるが、<strong>大容量データのトークン影響</strong>は人間が指摘する必要があった</p>
                         </div>
-                        
-                        <div class="highlight-box">
-                            <h3 style="margin-top: 0;">🎯 設計の重要性</h3>
-                            <p style="font-size: 0.8em;">最初にファイル保存手法の必要性を認識し、<strong>設計段階で考慮</strong>すべきだった</p>
-                        </div>
                     </div>
-                    <div>
-                        <div class="highlight-box">
-                            <h3 style="margin-top: 0;">📦 共通ユーティリティ化</h3>
-                            <p style="font-size: 0.8em;">utils/file-downloader.jsに<strong>ファイル保存機能を集約</strong>し、12ツール全てで再利用</p>
-                        </div>
-                        
-                        <div class="highlight-box">
-                            <h3 style="margin-top: 0;">🔄 段階的改善</h3>
-                            <p style="font-size: 0.8em;">最初は1つのツールで実装し、<strong>効果を確認後に全体に適用</strong></p>
-                        </div>
-                    </div>
-                </div>
 
                 <div class="problem-box">
                     <h3 style="margin-top: 0; text-align: center;">💡 最重要な学び</h3>
                     <p style="margin: 0; text-align: center; font-size: 0.9em;">
-                        <strong>大容量APIを扱うMCP開発では、最初からファイル保存手法を検討せよ</strong><br>
+                        <strong>データを返すAPIを扱う場合は、最初からファイル保存手法を検討する</strong><br>
                         後から修正するよりも、設計段階で組み込む方が効率的
                     </p>
                 </div>
             </section>
 
-            <!-- ファイル保存手法の具体的成果 -->
+
+
+            <!-- 結論 -->
             <section>
-                <h2>ファイル保存手法の具体的成果</h2>
+                <h2 style="color: #51cf66;">結論</h2>
                 
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px; margin: 40px 0;">
-                    <div style="text-align: center;">
-                        <div class="metric" style="color: #51cf66;">99.97%</div>
-                        <p style="font-size: 0.7em;"><strong>トークン削減</strong><br>575,000→200</p>
-                    </div>
-                    <div style="text-align: center;">
-                        <div class="metric" style="color: #42affa;">< 1秒</div>
-                        <p style="font-size: 0.7em;"><strong>応答時間</strong><br>（従来5-10秒）</p>
-                    </div>
-                    <div style="text-align: center;">
-                        <div class="metric" style="color: #ffa500;">∞MB</div>
-                        <p style="font-size: 0.7em;"><strong>対応可能<br>ファイルサイズ</strong></p>
-                    </div>
-                    <div style="text-align: center;">
-                        <div class="metric" style="color: #ff6b6b;">$0.004</div>
-                        <p style="font-size: 0.7em;"><strong>1リクエスト<br>コスト</strong></p>
-                    </div>
-                </div>
-                
-                <div class="solution-box">
-                    <h3 style="margin-top: 0; text-align: center;">ファイル保存手法の実証データ</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 0.8em;">
-                        <div>
-                            <strong>🚨 従来手法（直接返却）</strong>
-                            <ul style="text-align: left; color: #ff6b6b;">
-                                <li>トークン: 575,000個</li>
-                                <li>コスト: $11.50</li>
-                                <li>応答時間: 5-10秒</li>
-                                <li>制限: 〜5MB程度</li>
-                            </ul>
-                        </div>
-                        <div>
-                            <strong>✅ ファイル保存手法</strong>
-                            <ul style="text-align: left; color: #51cf66;">
-                                <li>トークン: 200個</li>
-                                <li>コスト: $0.004</li>
-                                <li>応答時間: <1秒</li>
-                                <li>制限: 数百MB対応</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="highlight-box">
-                    <p style="margin: 0; text-align: center; font-size: 0.9em;">
-                        <strong>ROI（投資収益率）:</strong> ファイル保存手法の実装コストに対し、<br>
-                        <strong>2875倍のコスト削減効果を実現</strong>
-                    </p>
-                </div>
-            </section>
-
-            <!-- 大容量APIでのファイル保存手法 - 他開発者への提言 -->
-            <section>
-                <h2>大容量APIでのファイル保存手法<br>- 他開発者への提言</h2>
-                
-                <div class="grid-2">
-                    <div>
-                        <div class="problem-box">
-                            <h3 style="margin-top: 0;">⚠️ 事前チェック必須</h3>
-                            <ul style="font-size: 0.8em; text-align: left;">
-                                <li><strong>APIレスポンスサイズ</strong>を事前に確認</li>
-                                <li><strong>1MB以上</strong>ならファイル保存手法を検討</li>
-                                <li>トークン換算: 1MB ≈ 250,000トークン</li>
-                                <li>コスト計算: 250,000トークン ≈ $5-10</li>
-                            </ul>
-                        </div>
-                        
-                        <div class="highlight-box">
-                            <h3 style="margin-top: 0;">🤖 AIエージェント開発時</h3>
-                            <ul style="font-size: 0.8em; text-align: left;">
-                                <li><strong>大容量データの可能性</strong>を最初に伝える</li>
-                                <li>「ファイル保存手法を検討してください」と明示</li>
-                                <li>output_pathパラメータの設計を依頼</li>
-                                <li>メタデータレスポンスの例を提示</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="solution-box">
-                            <h3 style="margin-top: 0;">✅ 実装パターン</h3>
-                            <ul style="font-size: 0.8em; text-align: left;">
-                                <li><strong>ハイブリッド設計:</strong> small→JSON, large→file</li>
-                                <li><strong>optional output_path</strong>で柔軟性確保</li>
-                                <li><strong>ストリーミング処理</strong>でメモリ効率化</li>
-                                <li><strong>メタデータ設計</strong>で必要十分な情報</li>
-                            </ul>
-                        </div>
-                        
-                        <div class="highlight-box">
-                            <h3 style="margin-top: 0;">🎯 対象API例</h3>
-                            <ul style="font-size: 0.8em; text-align: left;">
-                                <li><strong>地理データ:</strong> OpenStreetMap, Google Maps</li>
-                                <li><strong>画像/動画:</strong> メディア配信API</li>
-                                <li><strong>大規模データ:</strong> 統計、ログ、検索結果</li>
-                                <li><strong>ファイル配信:</strong> ダウンロードAPI全般</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="solution-box">
-                    <h3 style="margin-top: 0; text-align: center;">💡 実装ガイドライン</h3>
-                    <div style="font-size: 0.85em;">
-                        <strong>1.</strong> APIドキュメントでレスポンスサイズを確認<br>
-                        <strong>2.</strong> 1MB以上の可能性があればファイル保存手法を採用<br>
-                        <strong>3.</strong> AIエージェントにはこの制約を最初に説明<br>
-                        <strong>4.</strong> utils/共通処理として実装し、複数ツールで再利用
-                    </div>
-                </div>
-            </section>
-
-            <!-- まとめ: ファイル保存手法の結論 -->
-            <section>
-                <h2 style="color: #51cf66;">結論: 大容量APIデータの<br>ファイル保存手法は効果的</h2>
-                
-                <div class="solution-box">
-                    <h3 style="margin-top: 0;">ファイル保存手法で実現できること</h3>
-                    <ul style="text-align: left; font-size: 0.9em;">
-                        <li>✅ <strong>99.97%トークン削減</strong> - 575,000 → 200トークン</li>
-                        <li>✅ <strong>2875倍コスト削減</strong> - $11.50 → $0.004</li>
-                        <li>✅ <strong>大容量データ対応</strong> - 数百MB以上も処理可能</li>
-                        <li>✅ <strong>高速レスポンス</strong> - 5-10秒 → 1秒未満</li>
-                    </ul>
-                </div>
-
                 <div class="problem-box">
                     <h3 style="margin-top: 0; text-align: center;">🤖 AIエージェント開発者への重要メッセージ</h3>
-                    <p style="margin: 0; text-align: center; font-size: 0.95em;">
-                        <strong>AIエージェントは優秀だが、大容量データのトークン影響は考慮しない</strong><br>
-                        <strong>→ 人間が事前に「ファイル保存手法」の必要性を指示せよ</strong>
+                    <p style="margin: 0; text-align: left; font-size: 0.95em;">
+                        <strong>MCPサーバーは比較的シンプルな仕組みなのでAIエージェントがサクッとつくってくれるけど、AIは大容量データのトークンへの影響は考慮してくれないので、気づかないと不効率な実装になっていることがあるので気をつけましょう。<br>
+                            <br/>てか、従量課金だったら終わってた。</strong><br>
                     </p>
                 </div>
                 
-                <div class="highlight-box" style="margin-top: 30px;">
-                    <h3 style="margin-top: 0; text-align: center;">🎯 今すぐ行動すべきこと</h3>
-                    <div style="font-size: 0.9em;">
-                        <strong>1.</strong> あなたのAPIレスポンスサイズを確認<br>
-                        <strong>2.</strong> 1MB以上なら即座にファイル保存手法を検討<br>
-                        <strong>3.</strong> AIエージェントに制約を明確に伝える<br>
-                        <strong>4.</strong> 設計段階から組み込み、後戻りコストを回避
-                    </div>
-                </div>
                 
-                <div style="margin-top: 40px; text-align: center; font-size: 1.1em; color: #51cf66;">
-                    <strong>🚀 ファイル保存手法で、あなたのMCPプロジェクトも<br>コスト効率的で高性能なシステムに変身できます！</strong>
-                </div>
-                
-                <p style="margin-top: 30px; font-size: 0.7em; color: #888; text-align: center;">
-                    OpenStreetMap MCP実装詳細: GitHubリポジトリとドキュメント参照
-                </p>
             </section>
 
         </div>
