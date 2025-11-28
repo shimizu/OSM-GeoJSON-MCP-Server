@@ -86,21 +86,108 @@
             <!-- タイトルスライド -->
             <section>
                 <h1>AIエージェントでMCPサーバーを開発した際のトラブルと解決策</h1>
-                <p style="margin-top: 40px; font-size: 0.8em; color: #42affa;">
-                    OpenStreetMap MCP開発での実体験
-                </p>
+                <hr>
+			<p>
+				<small>Created by <a href="https://x.com/_shimizu">@_shimizu</a></small>
+			</p>
+
                 <p style="font-size: 0.6em; color: #888;">2025年11月</p>
             </section>
 
+            <section>
+                <h2>自己紹介</h2>
+                
+                    <div style="text-align: center;">
+                        <img width="200px" height="200px" src="img/prof.png" alt="自画像" style="border-radius: 50%; box-shadow: 0 5px 15px rgba(0,0,0,0.5); margin-bottom: 20px;"/>
+                    </div>
+                    
+                    <div class="tool-list">
+                        <ul style="text-align: left; list-style: none;">
+                            <li style="font-size: 1.2em; font-weight: bold; color: #42affa; margin-bottom: 15px;">氏名：清水正行</li>
+                            <li>所在：群馬県高崎市在住</li>
+                            <li>仕事：データビジュアライゼーションと地理情報システムのエンジニア</li>
+                            <li>趣味：資産運用</li>
+                            <li>最近一番注目していたイベント：<strong>NVIDIAの決算！</strong></li>
+                        </ul>
+                    </div>
+            </section>
+
+            <section>
+                <h2>開発したMCPサーバー</h2>
+                
+                <div class="solution-box">
+                    <h3 style="margin-top: 0;">🗺️ OSM-GeoJSON-MCP-Server</h3>
+                    <div class="tool-list">
+                        <ul>
+                            <li>OpenStreetMapデータをGeoJSON形式で取得</li>
+                            <li>Overpass APIを活用した効率的なデータ取得</li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 0.8em; margin-top: 15px; text-align: center;">
+                        <a href="https://github.com/shimizu/OSM-GeoJSON-MCP-Server" style="color: #42affa;">📍 GitHub Repository</a>
+                    </p>
+                </div>
+                
+                <div class="highlight-box">
+                    <h3 style="margin-top: 0;">🎨 ModelsLab Text2Image MCP Server</h3>
+                    <div class="tool-list">
+                        <ul>
+                            <li>ModelsLab APIを使用したText2imageを提供</li>
+                            <li>AIがMCPを通じて画像を生成</li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 0.8em; margin-top: 15px; text-align: center;">
+                        <a href="https://github.com/shimizu/modelslab-text2img-mcp-server" style="color: #42affa;">🎨 GitHub Repository</a>
+                    </p>
+                </div>
+            </section>
+
+            <section>
+                <h2>OpenStreetMap & Overpass API</h2>
+                
+                <div class="highlight-box">
+                    <h3 style="margin-top: 0;">🗺️ OpenStreetMap（OSM）とは</h3>
+                    <div class="tool-list">
+                        <ul>
+                            <li><strong>世界規模の協働地図プロジェクト</strong> - みんなで作るWikipediaの地図版</li>
+                            <li><strong>オープンデータ</strong> - 商用利用も可能な自由なライセンス</li>
+                            <li><strong>詳細な地理情報</strong> - 建物、道路、施設、自然地形まで網羅</li>
+                            <li><strong>リアルタイム更新</strong> - 世界中の貢献者により常に最新情報に更新</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="solution-box">
+                    <h3 style="margin-top: 0;">🔍 Overpass API</h3>
+                    <div class="tool-list">
+                        <ul>
+                            <li><strong>OSMデータ専用クエリAPI</strong> - 効率的な地理データ検索</li>
+                            <li><strong>無料で利用可能</strong> - API制限はあるが基本無料</li>
+                            <li><strong>独自のクエリ言語</strong> - 複雑な条件でのデータ抽出が可能<br>　だが学習コストが高い</li>
+                        </ul>
+                    </div>
+                </div>
+                                
+                <div style="text-align: center; margin-top: 20px;">
+                    <p style="font-size: 0.7em;">
+                        <a href="https://www.openstreetmap.org/#map=5/35.59/134.38" style="color: #42affa; margin-right: 20px;">🗺️ OpenStreetMap</a>
+                        <a href="https://wiki.openstreetmap.org/wiki/Overpass_API" style="color: #42affa;">📖 Overpass API Wiki</a>
+                    </p>
+                </div>
+            </section>
+
+
+
+
             <!-- AIエージェント開発背景 -->
             <section>
-                <h2>AIエージェント（Claude Code）でMCP開発</h2>
+                <h2>AIエージェント（Claude Code）で開発</h2>
                 <div class="highlight-box">
                     <h3 style="margin-top: 0;">🤖 開発背景</h3>
                     <div class="tool-list">
                         <ul>
                             <li><strong>Claude Code</strong>を使ってOpenStreetMap MCP サーバーを開発</li>
-                            <li><strong>12種類のツール</strong>で地理データ取得（建物、道路、施設など）</li>
+                            <li><strong>8種類のツール</strong>で地理データ取得（建物、道路、施設など）</li>
                             <li><strong>Overpass API</strong>からOSMデータをGeoJSON形式で提供</li>
                             <li><strong>AIエージェント主導</strong>で段階的に機能を実装</li>
                         </ul>
@@ -166,7 +253,7 @@ export async function getBuildings(client, args) {
                         <div class="tool-list">
                             <ul>
                                 <li>レスポンスサイズの想定</li>
-                                <li>1MBを超える可能性</li>
+                                <li>巨大データが返却される可能性</li>
                                 <li>トークン換算での計算</li>
                             </ul>
                         </div>
