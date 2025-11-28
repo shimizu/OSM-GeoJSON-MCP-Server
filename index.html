@@ -80,6 +80,15 @@
             font-weight: bold;
             margin-right: 10px;
         }
+        .profile-list {
+            font-size: 0.8em;
+        }
+        .profile-list li::before {
+            content: "• ";
+            color: #42affa;
+            font-weight: bold;
+            margin-right: 10px;
+        }
 
 
     </style>
@@ -106,11 +115,13 @@
                         <img width="200px" height="200px" src="img/prof.png" alt="自画像" style="border-radius: 50%; box-shadow: 0 5px 15px rgba(0,0,0,0.5); margin-bottom: 20px;"/>
                     </div>
                     
-                    <div class="tool-list">
+                    <div class="profile-list">
                         <ul style="text-align: left; list-style: none;">
                             <li style="font-size: 1.2em; font-weight: bold; color: #42affa; margin-bottom: 15px;">氏名：清水正行</li>
                             <li>所在：群馬県高崎市在住</li>
-                            <li>仕事：データビジュアライゼーションと地理情報システムのエンジニア</li>
+                            <li>仕事：データ可視化と地理情報システムのエンジニア
+                                <br>　<a href="https://vdata.nikkei.com/" target="_blank" style="color: #42affa; font-size: 0.9em;">📊 日経ビジュアルデータ</a>
+                            </li>
                             <li>趣味：資産運用</li>
                             <li>最近一番注目していたイベント：<strong>NVIDIAの決算！</strong></li>
                         </ul>
