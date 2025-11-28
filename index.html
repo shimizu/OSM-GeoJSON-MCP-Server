@@ -24,10 +24,14 @@
             color: #ffa500;
         }
         .reveal pre {
-            font-size: 0.45em;
+            font-size: 0.4em;
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            max-height: 50vh;
+            max-height: 30vh;
             overflow-y: auto;
+        }
+        .reveal pre code {
+            max-height: none;
+            overflow: visible;
         }
         .highlight-box {
             background: rgba(66, 175, 250, 0.1);
@@ -76,6 +80,7 @@
             font-weight: bold;
             margin-right: 10px;
         }
+
 
     </style>
 </head>
@@ -415,6 +420,7 @@ export async function downloadToFile(url, query, outputPath) {
                             <h4>📍 ツール</h4>
                             <ul>
                                 <li>test_connection（接続テスト）</li>
+                                <li>get_api_stats(API情報取得)</li>
                                 <li>get_buildings（建物）</li>
                                 <li>get_roads（道路）</li>
                                 <li>get_amenities（施設）</li>
