@@ -80,7 +80,7 @@ let testResults = {
 };
 
 // 個別テストの実行
-async function runTest(test) {
+async function runTest(test, verboseMode = false) {
   return new Promise((resolve) => {
     const testPath = path.join(__dirname, test.script);
     
@@ -288,7 +288,7 @@ async function runAllTests() {
       continue;
     }
     
-    const result = await runTest(test);
+    const result = await runTest(test, verboseMode);
     testResults.details.push(result);
     
     if (result.success) {

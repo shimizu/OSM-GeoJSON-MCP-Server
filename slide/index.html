@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenStreetMap MCP開発実録: 大容量データ問題の解決</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/black.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/monokai.min.css">
+    <style>
+        .reveal {
+            font-size: 32px;
+        }
+        .reveal h1 {
+            font-size: 2.2em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .reveal h2 {
+            font-size: 1.6em;
+            color: #42affa;
+        }
+        .reveal h3 {
+            font-size: 1.3em;
+            color: #ffa500;
+        }
+        .reveal pre {
+            font-size: 0.4em;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            max-height: 30vh;
+            overflow-y: auto;
+        }
+        .reveal pre code {
+            max-height: none;
+            overflow: visible;
+        }
+        .highlight-box {
+            background: rgba(66, 175, 250, 0.1);
+            border-left: 5px solid #42affa;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .problem-box {
+            background: rgba(255, 107, 107, 0.1);
+            border-left: 5px solid #ff6b6b;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .solution-box {
+            background: rgba(81, 207, 102, 0.1);
+            border-left: 5px solid #51cf66;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .metric {
+            font-size: 2em;
+            font-weight: bold;
+            text-align: center;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+        .tool-list {
+            text-align: left;
+            font-size: 0.8em;
+        }
+        .tool-list ul {
+            list-style: none;
+            padding: 0;
+        }
+        .tool-list li {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+        .tool-list li::before {
+            content: "✓ ";
+            color: #51cf66;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            
+            <!-- タイトルスライド -->
+            <section>
+                <h1>AIエージェントでMCPサーバーを開発した際のトラブルと解決策</h1>
+                <hr>
+			<p>
+				<small>Created by <a href="https://x.com/_shimizu" target="_blank">@_shimizu</a></small>
+			</p>
+
+                <p style="font-size: 0.6em; color: #888;">2025年11月</p>
+            </section>
+
+            <section>
+                <h2>自己紹介</h2>
+                
+                    <div style="text-align: center;">
+                        <img width="200px" height="200px" src="img/prof.png" alt="自画像" style="border-radius: 50%; box-shadow: 0 5px 15px rgba(0,0,0,0.5); margin-bottom: 20px;"/>
+                    </div>
+                    
+                    <div class="tool-list">
+                        <ul style="text-align: left; list-style: none;">
+                            <li style="font-size: 1.2em; font-weight: bold; color: #42affa; margin-bottom: 15px;">氏名：清水正行</li>
+                            <li>所在：群馬県高崎市在住</li>
+                            <li>仕事：データビジュアライゼーションと地理情報システムのエンジニア</li>
+                            <li>趣味：資産運用</li>
+                            <li>最近一番注目していたイベント：<strong>NVIDIAの決算！</strong></li>
+                        </ul>
+                    </div>
+            </section>
+
+            <section>
+                <h2>開発したMCPサーバー</h2>
+                
+                <div class="solution-box">
+                    <h3 style="margin-top: 0;">🗺️ OSM-GeoJSON-MCP-Server</h3>
+                    <div class="tool-list">
+                        <ul>
+                            <li>OpenStreetMapデータをGeoJSON形式で取得</li>
+                            <li>Overpass APIを活用した効率的なデータ取得</li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 0.8em; margin-top: 15px; text-align: center;">
+                        <a href="https://github.com/shimizu/OSM-GeoJSON-MCP-Server" style="color: #42affa;" target="_blank">📍 GitHub Repository</a>
+                    </p>
+                </div>
+                
+                <div class="highlight-box">
+                    <h3 style="margin-top: 0;">🎨 ModelsLab Text2Image MCP Server</h3>
+                    <div class="tool-list">
+                        <ul>
+                            <li>ModelsLab APIを使用したText2imageを提供</li>
+                            <li>AIがMCPを通じて画像を生成</li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 0.8em; margin-top: 15px; text-align: center;">
+                        <a href="https://github.com/shimizu/modelslab-text2img-mcp-server" style="color: #42affa;" target="_blank">🎨 GitHub Repository</a>
+                    </p>
+                </div>
+            </section>
+
+            <section>
+                <h2>OpenStreetMap & Overpass API</h2>
+                
+                <div class="highlight-box">
+                    <h3 style="margin-top: 0;">🗺️ OpenStreetMap（OSM）とは</h3>
+                    <div class="tool-list">
+                        <ul>
+                            <li><strong>世界規模の協働地図プロジェクト</strong> - みんなで作るWikipediaの地図版</li>
+                            <li><strong>オープンデータ</strong> - 商用利用も可能な自由なライセンス</li>
+                            <li><strong>詳細な地理情報</strong> - 建物、道路、施設、自然地形まで網羅</li>
+                            <li><strong>リアルタイム更新</strong> - 世界中の貢献者により常に最新情報に更新</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="solution-box">
+                    <h3 style="margin-top: 0;">🔍 Overpass API</h3>
+                    <div class="tool-list">
+                        <ul>
+                            <li><strong>OSMデータ専用クエリAPI</strong> - 効率的な地理データ検索</li>
+                            <li><strong>無料で利用可能</strong> - API制限はあるが基本無料</li>
+                            <li><strong>独自のクエリ言語</strong> - 複雑な条件でのデータ抽出が可能<br>　だが学習コストが高い</li>
+                        </ul>
+                    </div>
+                </div>
+                                
+                <div style="text-align: center; margin-top: 20px;">
+                    <p style="font-size: 0.7em;">
+                        <a href="https://www.openstreetmap.org/#map=5/35.59/134.38" style="color: #42affa; margin-right: 20px;" target="_blank">🗺️ OpenStreetMap</a>
+                        <a href="https://wiki.openstreetmap.org/wiki/Overpass_API" style="color: #42affa;" target="_blank">📖 Overpass API Wiki</a>
+                    </p>
+                </div>
+            </section>
+
+
+
+
+            <!-- AIエージェント開発背景 -->
+            <section>
+                <h2>AIエージェント（Claude Code）で開発</h2>
+                <div class="highlight-box">
+                    <h3 style="margin-top: 0;">🤖 開発背景</h3>
+                    <div class="tool-list">
+                        <ul>
+                            <li><strong>Claude Code</strong>を使ってOpenStreetMap MCP サーバーを開発</li>
+                            <li><strong>8種類のツール</strong>で地理データ取得（建物、道路、施設など）</li>
+                            <li><strong>Overpass API</strong>からOSMデータをGeoJSON形式で提供</li>
+                            <li><strong>AIエージェント主導</strong>で段階的に機能を実装</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="problem-box">
+                    <p style="margin: 0; text-align: center;">
+                        <strong>しかし、AIエージェントが作った当初の仕様に重大な問題が...</strong>
+                    </p>
+                </div>
+            </section>
+
+            <!-- AIエージェントの当初仕様 -->
+            <section>
+                <h2>AIエージェントが作った当初の仕様</h2>
+                
+                <div class="problem-box">
+                    <h3 style="margin-top: 0; color: #ff6b6b;">❌ 当初の仕様: APIレスポンスを直接LLMに返却</h3>
+                    <pre><code class="language-javascript" data-trim>
+// AIエージェントが実装した当初のコード
+export async function getBuildings(client, args) {
+  const osmData = await client.query(query);
+  const geojson = osmToGeoJSON(osmData);
+  
+  return {
+    content: [{
+      type: 'text',
+      text: JSON.stringify(geojson, null, 2)  // 🚨 巨大データを直接返す
+    }]
+  };
+}
+                    </code></pre>
+                </div>
+
+                <div class="highlight-box">
+                    <p style="margin: 0; text-align: center; font-size: 0.9em;">
+                        <strong>AIエージェントの想定:</strong> 「MCPツールはAPIデータをそのまま返すもの」<br>
+                        → <strong>大容量データの場合のトークン消費を考慮していなかった</strong>
+                    </p>
+                </div>
+
+            </section>
+
+            <!-- 大容量APIの考慮事項 -->
+            <section>
+                <h2>大容量APIを扱う際の重要な考慮事項</h2>
+                
+                <div class="problem-box">
+                    <h3 style="margin-top: 0;">⚠️ 大容量データAPIの特徴</h3>
+                    <div class="tool-list">
+                        <ul>
+                            <li><strong>地理データAPI</strong>: OpenStreetMap、Google Maps等</li>
+                            <li><strong>画像・動画API</strong>: メディア配信サービス</li>
+                            <li><strong>大規模データセットAPI</strong>: 統計データ、ログデータ等</li>
+                            <li><strong>検索結果API</strong>: 大量の結果を返すAPI</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <h3 style="margin-top: 0;">💡 事前に確認すべきポイント</h3>
+                    <div class="grid-2">
+                        <div class="tool-list">
+                            <ul>
+                                <li>レスポンスサイズの想定</li>
+                                <li>巨大データが返却される可能性</li>
+                                <li>トークン換算での計算</li>
+                            </ul>
+                        </div>
+                        <div class="tool-list">
+                            <ul>
+                                <li>ページネーション機能</li>
+                                <li>ファイルダウンロード機能</li>
+                                <li>ストリーミング対応</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ファイル保存手法の解決策 -->
+            <section>
+                <h2>　Toolの仕様を変更</h2>
+                
+                <div class="solution-box">
+                    <h3 style="margin-top: 0; color: #51cf66;">✅ 新しい仕様: ファイル保存 + メタデータ返却</h3>
+                    <pre><code class="language-javascript" data-trim>
+export async function getBuildings(client, args) {
+  const { output_path } = args;
+  
+  if (output_path) {
+    // 🎯 ファイル保存手法: 大容量データをファイルに保存
+    const result = await executeGeoJSONQuery(client, query, output_path);
+    
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify({
+          status: 'success',
+          message: '建物データをファイルに保存しました',
+          file: output_path,              // ✅ ファイルパスのみ
+          size: result.size,              // ✅ メタデータ
+          feature_count: result.feature_count  // ✅ サマリー情報
+        }, null, 2)
+      }]
+    };
+  }
+  // 小さなデータは従来通り直接返却
+}
+                    </code></pre>
+                </div>
+                
+                <div class="highlight-box">
+                    <h3 style="margin-top: 0;">💡 APIリクエスト時の処理</h3>
+                    <p style="margin: 0; text-align: center; font-size: 0.9em;">
+                        <strong>大容量データ → ファイル保存</strong><br>
+                        <strong>LLMには → メタデータのみ返却</strong><br>
+                    </p>
+                </div>
+                
+            </section>
+
+            <!-- executeGeoJSONQuery の説明 -->
+            <section>
+                <h2>ファイル保存前の変換処理</h2>
+                
+                <div class="highlight-box">
+                    <h3 style="margin-top: 0;">🔄 OSMデータ → GeoJSONファイル変換フロー</h3>
+                    <pre><code class="language-javascript" data-trim>
+export async function executeGeoJSONQuery(overpassClient, query, outputPath) {
+  // 1. OSMデータを一時ファイルにダウンロード
+  const tempPath = outputPath + '.tmp.osm.json';
+  await downloadToFile(server.url, fullQuery, tempPath);
+  
+  // 2. OSMデータを読み込み
+  const osmData = JSON.parse(await fs.readFile(tempPath));
+  
+  // 3. GeoJSONに変換
+  const geojson = osmtogeojson(osmData);
+  
+  // 4. 最終ファイルに保存
+  await fs.writeFile(outputPath, JSON.stringify(geojson, null, 2));
+  
+  // 5. 一時ファイル削除
+  await fs.unlink(tempPath);
+  
+  return {
+    size: `${(Buffer.byteLength(JSON.stringify(geojson))/1024/1024).toFixed(2)} MB`,
+    feature_count: geojson.features.length
+  };
+}
+                    </code></pre>
+                </div>
+
+                <div class="solution-box">
+                    <h3 style="margin-top: 0;">💡 なぜ2段階処理？</h3>
+                        <div class="tool-list">
+                            <ul>
+                                <li>OSMのデータ形式 → 標準GeoJSON形式</li>
+                                <li>地理情報システムで利用可能なフォーマットに</li>
+                            </ul>
+                        </div>
+                </div>
+            </section>
+
+            <!-- ファイル保存手法の実装詳細 -->
+            <section>
+                <h2>ファイル保存処理</h2>
+                
+                <div class="highlight-box">
+                    <h3 style="margin-top: 0;">utils/file-downloader.js</h3>
+                    <pre><code class="language-javascript" data-trim>
+export async function downloadToFile(url, query, outputPath) {
+  return new Promise((resolve, reject) => {
+    const req = https.request(options, (res) => {
+      const writeStream = createWriteStream(outputPath);
+      let downloadedBytes = 0;
+
+      res.on('data', (chunk) => {
+        downloadedBytes += chunk.length;
+        // 大容量ファイルの進行状況表示
+        if (downloadedBytes % (1024 * 1024) === 0) {
+          console.error(`Downloaded: ${(downloadedBytes/1024/1024).toFixed(1)} MB`);
+        }
+      });
+
+      // 🔥 ストリーミング書き込みでメモリ効率化
+      res.pipe(writeStream);
+      
+      writeStream.on('finish', () => {
+        resolve({ 
+          size: `${(downloadedBytes/1024/1024).toFixed(2)} MB`,
+          bytes: downloadedBytes 
+        });
+      });
+    });
+    
+    req.write(query);
+    req.end();
+  });
+}
+                    </code></pre>
+                </div>
+
+                <div class="solution-box">
+                    <h3 style="margin-top: 0;">🎯 ファイル保存手法の利点</h3>
+                        <div class="tool-list">
+                            <ul>
+                                <li><strong>メモリ効率</strong>: ストリーミング処理</li>
+                                <li><strong>高速</strong>: 直接ディスク書き込み</li>
+                            </ul>
+                        </div>
+                </div>
+            </section>
+
+
+            <!-- ファイル保存手法の適用結果 -->
+            <section>
+                <h2>最終的なMCPの仕様</h2>
+                
+                <div class="solution-box">
+                    <h3 style="margin-top: 0;">🎯ツールとユーティリティ</h3>
+                    <div class="grid-2">
+                        <div class="tool-list">
+                            <h4>📍 ツール</h4>
+                            <ul>
+                                <li>test_connection（接続テスト）</li>
+                                <li>get_api_stats(API情報取得)</li>
+                                <li>get_buildings（建物）</li>
+                                <li>get_roads（道路）</li>
+                                <li>get_amenities（施設）</li>
+                                <li>get_waterways（水域）</li>
+                                <li>get_green_spaces（緑地）</li>
+                                <li>get_railways（鉄道）</li>
+                            </ul>
+                        </div>
+                        <div class="tool-list">
+                            <h4>🛠️ ユーティリティ</h4>
+                            <ul>
+                                <li>file-downloader(ダウンロード)</li>
+                                <li>converter（変換）</li>
+                                <li>overpass(API管理)</li>
+                                <li>cache（キャシング）</li>
+                                <li>logger(ログ保存)</li>
+                                <li>validator(入力検証)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+
+            </section>
+
+            <!-- 　MCPサーバー開発で学んだ教訓 -->
+            <section>
+                <h2>MCPサーバー開発で学んだ教訓</h2>
+                
+                    <div>
+                        <div class="highlight-box">
+                            <h3 style="margin-top: 0;">🤖 AIエージェントの盲点</h3>
+                            <p style="font-size: 0.8em;">AIエージェントはコードを書くことはできるが、<strong>大容量データのトークン影響</strong>は人間が指摘する必要があった</p>
+                        </div>
+                    </div>
+
+                <div class="problem-box">
+                    <h3 style="margin-top: 0; text-align: center;">💡 最重要な学び</h3>
+                    <p style="margin: 0; text-align: center; font-size: 0.9em;">
+                        <strong>データを返すAPIを扱う場合は、最初からファイル保存手法を検討する</strong><br>
+                        後から修正するよりも、設計段階で組み込む方が効率的
+                    </p>
+                </div>
+            </section>
+
+
+
+            <!-- 結論 -->
+            <section>
+                <h2 style="color: #51cf66;">結論</h2>
+                
+                <div class="problem-box">
+                    <h3 style="margin-top: 0; text-align: center;">🤖 AIエージェント開発者への重要メッセージ</h3>
+                    <p style="margin: 0; text-align: left; font-size: 0.95em;">
+                        <strong>MCPサーバーは比較的シンプルな仕組みなのでAIエージェントがサクッとつくってくれるけど、AIは大容量データのトークンへの影響は考慮してくれないので、気づかないと不効率な実装になっていることがあるので気をつけましょう。<br>
+                            <br/>てか、従量課金だったら終わってた。</strong><br>
+                    </p>
+                </div>
+                
+                
+            </section>
+
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/highlight/highlight.min.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            transition: 'slide',
+            backgroundTransition: 'fade',
+            controls: true,
+            progress: true,
+            center: true,
+            slideNumber: 'c/t',
+            plugins: [ RevealHighlight ],
+            highlight: {
+                highlightOnLoad: true
+            }
+        });
+    </script>
+</body>
+</html>

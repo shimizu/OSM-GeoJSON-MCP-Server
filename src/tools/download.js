@@ -1,7 +1,4 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { createWriteStream } from 'fs';
-import https from 'https';
+import { downloadToFile, executeGeoJSONQuery } from '../utils/file-downloader.js';
 
 export const downloadOSMDataSchema = {
   name: 'download_osm_data',
@@ -15,7 +12,7 @@ export const downloadOSMDataSchema = {
       },
       output_path: {
         type: 'string',
-        description: '保存先ファイルパス（例: ./data/tokyo_buildings.json）'
+        description: '保存先ファイルパス（例: ./data/tokyo_buildings.geojson）'
       },
       format: {
         type: 'string',
@@ -28,24 +25,6 @@ export const downloadOSMDataSchema = {
   }
 };
 
-export const downloadAreaBuildingsSchema = {
-  name: 'download_area_buildings',
-  description: '指定エリアの建物データをダウンロード（簡易版）',
-  inputSchema: {
-    type: 'object',
-    properties: {
-      minLon: { type: 'number', description: '最小経度（西端）' },
-      minLat: { type: 'number', description: '最小緯度（南端）' },
-      maxLon: { type: 'number', description: '最大経度（東端）' },
-      maxLat: { type: 'number', description: '最大緯度（北端）' },
-      output_path: {
-        type: 'string',
-        description: '保存先ファイルパス'
-      }
-    },
-    required: ['minLon', 'minLat', 'maxLon', 'maxLat', 'output_path']
-  }
-};
 
 export const downloadAreaAllSchema = {
   name: 'download_area_all',
@@ -66,64 +45,6 @@ export const downloadAreaAllSchema = {
   }
 };
 
-async function downloadToFile(url, query, outputPath, headers = {}) {
-  return new Promise((resolve, reject) => {
-    const urlObj = new URL(url);
-    
-    const options = {
-      hostname: urlObj.hostname,
-      port: 443,
-      path: urlObj.pathname,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'text/plain',
-        'Content-Length': Buffer.byteLength(query),
-        'User-Agent': 'OSM-MCP/1.0',
-        ...headers
-      },
-      rejectUnauthorized: false
-    };
-
-    const req = https.request(options, (res) => {
-      if (res.statusCode !== 200) {
-        reject(new Error(`HTTP ${res.statusCode}: ${res.statusMessage}`));
-        return;
-      }
-
-      const dir = path.dirname(outputPath);
-      fs.mkdir(dir, { recursive: true }).then(() => {
-        const writeStream = createWriteStream(outputPath);
-        let downloadedBytes = 0;
-
-        res.on('data', (chunk) => {
-          downloadedBytes += chunk.length;
-          if (downloadedBytes % (1024 * 1024) === 0) {
-            console.error(`Downloaded: ${(downloadedBytes / 1024 / 1024).toFixed(1)} MB`);
-          }
-        });
-
-        res.pipe(writeStream);
-
-        writeStream.on('finish', () => {
-          const sizeMB = (downloadedBytes / 1024 / 1024).toFixed(2);
-          resolve({ 
-            success: true, 
-            path: outputPath, 
-            size: `${sizeMB} MB`,
-            bytes: downloadedBytes 
-          });
-        });
-
-        writeStream.on('error', reject);
-      }).catch(reject);
-    });
-
-    req.on('error', reject);
-    req.setTimeout(300000); // 5分のタイムアウト
-    req.write(query);
-    req.end();
-  });
-}
 
 export async function downloadOSMData(overpassClient, args) {
   const { query, output_path, format = 'json' } = args;
@@ -167,20 +88,6 @@ export async function downloadOSMData(overpassClient, args) {
   throw new Error(`All servers failed: ${lastError?.message}`);
 }
 
-export async function downloadAreaBuildings(overpassClient, args) {
-  const { minLon, minLat, maxLon, maxLat, output_path } = args;
-  
-  const query = `[out:json][timeout:180];
-(
-  way["building"](${minLat},${minLon},${maxLat},${maxLon});
-  relation["building"](${minLat},${minLon},${maxLat},${maxLon});
-);
-out body;
->;
-out skel qt;`;
-  
-  return await downloadOSMData(overpassClient, { query, output_path, format: 'json' });
-}
 
 export async function downloadAreaAll(overpassClient, args) {
   const { minLon, minLat, maxLon, maxLat, output_path } = args;

@@ -4,7 +4,7 @@
 
 ## プロジェクト概要
 
-OpenStreetMapのデータをOverpass API経由で取得し、GeoJSON形式で返すMCP (Model Context Protocol)サーバーです。モジュラーアーキテクチャを採用し、8つの包括的な地理データ取得ツールを提供しています。
+OpenStreetMapのデータをOverpass API経由で取得し、GeoJSON形式で返すMCP (Model Context Protocol)サーバーです。モジュラーアーキテクチャを採用し、12個の包括的な地理データ取得・処理ツールを提供しています。
 
 ## 主要コンポーネント
 
@@ -85,13 +85,12 @@ src/
     ├── validator.js           # 入力検証
     ├── cache.js               # LRUキャッシュ実装
     ├── logger.js              # APIログ・統計
-    ├── prompt-parser.js       # プロンプト解析
-    └── file-handler.js        # ファイル出力処理
+    └── file-downloader.js     # ファイルダウンロード処理
 ```
 
 ### MCP統合
 - `@modelcontextprotocol/sdk`を使用したMCPプロトコル実装
-- 10のツールを提供:
+- 12個のツールを提供:
   - `test_connection`: Overpass API接続テスト
   - `get_buildings`: 建物データ取得（limit対応）
   - `get_roads`: 道路ネットワーク取得（limit対応）
@@ -101,7 +100,8 @@ src/
   - `get_railways`: 鉄道データ取得（limit対応）
   - `get_api_stats`: API使用統計・キャッシュ状況
   - `convert_to_geojson`: OSMファイル→GeoJSON変換
-  - `download_osm_data`: 生データダウンロード
+  - `download_osm_data`: Overpass QLクエリで生データダウンロード
+  - `download_area_all`: エリア指定で全データダウンロード
 - すべてのツールはMCP応答形式でラップされたGeoJSONを返す
 - ファイル出力オプションも全ツールで利用可能
 
@@ -268,8 +268,7 @@ out skel qt;`;
 - **validator.js**: 共通の入力検証ロジック、limit検証機能
 - **cache.js**: LRUキャッシュ実装、15分TTL管理
 - **logger.js**: API使用状況とエラー追跡
-- **prompt-parser.js**: 自然言語から制限値抽出
-- **file-handler.js**: ファイル出力処理の共通化
+- **file-downloader.js**: HTTPSファイルダウンロードとGeoJSON変換の共通処理
 - **tools/index.js**: ツールの統合と実行ディスパッチ
 
 ### パフォーマンス考慮事項
@@ -294,8 +293,9 @@ out skel qt;`;
 ### ユーティリティツール
 - `get_api_stats`: API使用統計、キャッシュ状況、エラー率
 - `convert_to_geojson`: OSMファイル→GeoJSON変換
-- `download_osm_data`: Overpass QLクエリで生データ取得
-- `download_area_buildings`: エリア指定で建物データダウンロード
+
+### ダウンロードツール
+- `download_osm_data`: Overpass QLクエリで生データダウンロード
 - `download_area_all`: エリア指定で全データダウンロード
 
 ## トラブルシューティング

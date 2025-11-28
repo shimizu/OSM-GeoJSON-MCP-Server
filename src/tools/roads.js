@@ -3,7 +3,7 @@
 
 import { validateCommonInputs, validateFilter } from '../utils/validator.js';
 import { osmToGeoJSON, createGeoJSONResponse } from '../utils/converter.js';
-import fs from 'fs/promises';
+import { executeGeoJSONQuery } from '../utils/file-downloader.js';
 import osmtogeojson from 'osmtogeojson';
 
 export const roadsToolSchema = {
@@ -68,7 +68,7 @@ export async function getRoads(overpassClient, args) {
   // 制限値をクエリに適用
   const outStatement = normalizedLimit ? `out body ${normalizedLimit};` : 'out body;';
   
-  const query = `[out:json][timeout:180][maxsize:1073741824];
+  const query = `[timeout:180][maxsize:1073741824];
 (
   way${roadFilter}(${minLat},${minLon},${maxLat},${maxLon});
 );
@@ -79,40 +79,23 @@ out skel qt;`;
   try {
     // ファイル出力が指定されている場合
     if (output_path) {
-      const result = await overpassClient.queryToFile(query, output_path);
-      
-      // OSMデータをGeoJSONに変換する場合
-      if (output_path.endsWith('.geojson')) {
-        const osmData = JSON.parse(await fs.readFile(output_path, 'utf8'));
-        const geojson = osmtogeojson(osmData);
-        await fs.writeFile(output_path, JSON.stringify(geojson, null, 2));
-        
-        return {
-          content: [{
-            type: 'text',
-            text: JSON.stringify({
-              status: 'success',
-              message: '道路データをダウンロードしました',
-              file: output_path,
-              size: result.size,
-              feature_count: geojson.features.length,
-              road_types: road_types,
-              bbox: [minLon, minLat, maxLon, maxLat],
-              server: result.server
-            }, null, 2)
-          }]
-        };
+      if (!output_path.endsWith('.geojson')) {
+        throw new Error('ファイル出力は .geojson 形式のみサポートしています。');
       }
       
-      // OSM形式のまま保存
+      const result = await executeGeoJSONQuery(overpassClient, query, output_path);
+      
       return {
         content: [{
           type: 'text',
           text: JSON.stringify({
             status: 'success',
-            message: '道路データをダウンロードしました（OSM形式）',
+            message: '道路データをダウンロードしました',
             file: output_path,
             size: result.size,
+            feature_count: result.feature_count,
+            limit_applied: normalizedLimit,
+            is_truncated: normalizedLimit ? result.feature_count >= normalizedLimit : false,
             road_types: road_types,
             bbox: [minLon, minLat, maxLon, maxLat],
             server: result.server
@@ -122,7 +105,7 @@ out skel qt;`;
     }
     
     // 従来の動作：JSONレスポンスを返す
-    const osmData = await overpassClient.query(query, false, 'get_roads');
+    const osmData = await overpassClient.query(`[out:json]${query}`, false, 'get_roads');
     const geojson = osmToGeoJSON(osmData);
     
     const response = createGeoJSONResponse(geojson, {

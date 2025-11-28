@@ -287,12 +287,6 @@ OSMファイルをGeoJSONに変換します。
 - `output_path`: 保存先ファイルパス（必須）
 - `format` (オプション): 出力形式 (`json`, `xml`)
 
-### 🏗️ download_area_buildings  
-指定エリアの建物データをダウンロードします。
-
-**パラメータ:**
-- `minLon`, `minLat`, `maxLon`, `maxLat`: 取得範囲の座標（必須）
-- `output_path`: 保存先ファイルパス（必須）
 
 ### 🌐 download_area_all
 指定エリアの全データをダウンロードします。
@@ -430,13 +424,8 @@ chmod +x src/index.js
 claude mcp add osm-geojson node src/index.js
 
 # または絶対パスで登録
-claude mcp add osm-geojson /absolute/path/to/osm-geojson-mcp-server/src/index.js
+claude mcp add osm-geojson [absolute path to ]/osm-geojson-mcp-server/src/index.js
 ```
-
-**スコープオプション:**
-- `--local` (デフォルト): 現在のプロジェクトのみ
-- `--project`: チーム共有（.mcp.jsonに保存）
-- `--user`: 複数プロジェクト間で使用
 
 詳細は [Claude Code MCP ドキュメント](https://docs.anthropic.com/ja/docs/claude-code/mcp) を参照してください。
 

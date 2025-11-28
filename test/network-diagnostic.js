@@ -46,7 +46,8 @@ async function testHTTPSRequest(url) {
       method: 'GET',
       timeout: 10000,
       headers: {
-        'User-Agent': 'OSM-Diagnostic/1.0'
+        'Host': parsedUrl.hostname.match(/^\d+\.\d+\.\d+\.\d+$/) ? 'overpass-api.de' : parsedUrl.hostname,
+        'User-Agent': 'OSM-MCP/1.0'
       }
     };
     
@@ -83,23 +84,22 @@ async function testHTTPSRequest(url) {
   });
 }
 
-// 他のHTTPSサービスへの接続テスト
-async function testOtherServices() {
-  console.log('\n=== Testing other HTTPS services ===\n');
+// Overpass API特化接続テスト
+async function testOverpassServices() {
+  console.log('\n=== Testing Overpass API services ===\n');
   
-  const services = [
-    'https://www.google.com',
-    'https://api.github.com',
-    'https://httpbin.org/get',
-    'https://www.openstreetmap.org'
+  const overpassServers = [
+    { url: 'https://162.55.144.139/api/interpreter', host: 'overpass-api.de' },
+    { url: 'https://65.109.112.52/api/interpreter', host: 'lz4.overpass-api.de' },
+    { url: 'https://193.219.97.30/api/interpreter', host: 'overpass.kumi.systems' }
   ];
   
-  for (const service of services) {
-    const result = await testHTTPSRequest(service);
+  for (const server of overpassServers) {
+    const result = await testHTTPSRequest(server.url);
     if (result.success) {
-      console.log(`✓ ${service} - Status: ${result.statusCode} (${result.duration}ms)`);
+      console.log(`✓ ${server.host} (${server.url}) - Status: ${result.statusCode} (${result.duration}ms)`);
     } else {
-      console.log(`✗ ${service} - Error: ${result.error}`);
+      console.log(`✗ ${server.host} (${server.url}) - Error: ${result.error}`);
     }
   }
 }
@@ -150,7 +150,7 @@ async function simpleTraceroute(host) {
 async function curlEquivalent() {
   console.log('\n=== Testing with minimal HTTP client ===\n');
   
-  const testUrl = 'https://overpass-api.de/api/interpreter';
+  const testUrl = 'https://162.55.144.139/api/interpreter';
   const minimalQuery = '[out:json];out count;';
   
   return new Promise((resolve) => {
@@ -162,9 +162,10 @@ async function curlEquivalent() {
       path: parsedUrl.pathname,
       method: 'POST',
       headers: {
+        'Host': parsedUrl.hostname.match(/^\d+\.\d+\.\d+\.\d+$/) ? 'overpass-api.de' : parsedUrl.hostname,
         'Content-Type': 'text/plain',
         'Content-Length': Buffer.byteLength(minimalQuery),
-        'User-Agent': 'curl/7.64.1'
+        'User-Agent': 'OSM-MCP/1.0'
       },
       timeout: 30000,
       rejectUnauthorized: false // 証明書エラーを無視（デバッグ用）
@@ -216,9 +217,9 @@ function showSystemInfo() {
 // すべてのテストを実行
 async function runDiagnostics() {
   showSystemInfo();
-  await testOtherServices();
+  await testOverpassServices();
   await testPort443();
-  await simpleTraceroute('overpass-api.de');
+  await simpleTraceroute('162.55.144.139');
   await curlEquivalent();
 }
 

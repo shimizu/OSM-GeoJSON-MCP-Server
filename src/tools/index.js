@@ -8,23 +8,22 @@ import { testConnectionToolSchema, testConnection } from './test_connection.js';
 import { waterwaysToolSchema, getWaterways } from './waterways.js';
 import { greenspacesToolSchema, getGreenSpaces } from './greenspaces.js';
 import { railwaysToolSchema, getRailways } from './railways.js';
-import { downloadOSMDataSchema, downloadAreaBuildingsSchema, downloadAreaAllSchema, downloadOSMData, downloadAreaBuildings, downloadAreaAll } from './download.js';
+import { downloadOSMDataSchema, downloadAreaAllSchema, downloadOSMData, downloadAreaAll } from './download.js';
 import { convertToGeoJSONSchema, convertToGeoJSON } from './convert.js';
 import { statsToolSchema, getApiStats } from './stats.js';
 
 // すべてのツールスキーマをエクスポート
 export const toolSchemas = [
+  testConnectionToolSchema,
   buildingsToolSchema,
   roadsToolSchema,
   amenitiesToolSchema,
-  testConnectionToolSchema,
   waterwaysToolSchema,
   greenspacesToolSchema,
   railwaysToolSchema,
-  downloadOSMDataSchema,
-  downloadAreaBuildingsSchema,
-  downloadAreaAllSchema,
-  convertToGeoJSONSchema,
+//  downloadOSMDataSchema,
+//  downloadAreaAllSchema,
+//  convertToGeoJSONSchema,
   statsToolSchema
 ];
 
@@ -37,10 +36,9 @@ export const toolHandlers = {
   'get_waterways': getWaterways,
   'get_green_spaces': getGreenSpaces,
   'get_railways': getRailways,
-  'download_osm_data': downloadOSMData,
-  'download_area_buildings': downloadAreaBuildings,
-  'download_area_all': downloadAreaAll,
-  'convert_to_geojson': convertToGeoJSON,
+//  'download_osm_data': downloadOSMData,
+//  'download_area_all': downloadAreaAll,
+//  'convert_to_geojson': convertToGeoJSON,
   'get_api_stats': getApiStats
 };
 

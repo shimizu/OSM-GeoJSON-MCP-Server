@@ -40,7 +40,7 @@ export class OSMGeoJSONServer {
     // 初期化完了通知のハンドラー
     this.server.setNotificationHandler(InitializedNotificationSchema, async () => {
       // 初期化完了の通知を受信（応答は不要）
-      console.error('MCP server initialized and ready');
+      //console.error('MCP server initialized and ready');
     });
 
     // 利用可能なツールのリストを返すハンドラー
@@ -117,6 +117,6 @@ export class OSMGeoJSONServer {
   async run() {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    console.error('OSM GeoJSON MCPサーバーが起動しました...');
+    //console.error('OSM GeoJSON MCPサーバーが起動しました...');
   }
 }
